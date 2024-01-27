@@ -51,8 +51,10 @@ var _player_cards_count := 0
 var _enemy_cards_count := 0
 var _player_deck := []
 var _enemy_deck := []
+var _player_discard_pile := []
+var _enemy_discard_pile := []
 var _current_action := \"\"
-var _action_owner := \"\"
+var _action_owner: Character
 
 
 # --- Onready Variables ---
@@ -105,26 +107,24 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 	_player_deck.shuffle()
 	_enemy_deck.shuffle()
 	
-	for _i in range(0, p_player.draw_amount):
-		_draw_new_card(p_player, _player_deck.pop_front())
-	
-	for _i in range(0, p_player.draw_amount):
-		_draw_new_card(p_enemy, _enemy_deck.pop_front())
+	_new_turn()
 
 
 func request_card_use(p_card: Control) -> void:
+	if p_card.card_owner != _action_owner:
+		return
+	
 	if p_card.card_owner == _player_obj:
 		_player_cards_count -= 1
 		_disconnect_player_card_signals(p_card)
 	
 	else:
-#		var flip_tween = create_tween()
-#		flip_tween.tween_property(p_card, \"rotation\", 0, 0.3)
 		_enemy_cards_count -= 1
 	
 	p_card.z_index = 3
 	p_card.prepare_to_use()
 	p_card.reparent($used_cards_pile)
+	
 	
 	var tween = create_tween()
 	tween.tween_property(p_card, \"global_position\", 
@@ -135,6 +135,10 @@ func request_card_use(p_card: Control) -> void:
 	
 	if p_card.card_owner == _enemy_obj:
 		p_card.flip()
+		_enemy_discard_pile.append(p_card.get_card_data())
+	
+	else:
+		_player_discard_pile.append(p_card.get_card_data())
 
 
 # --- Private Functions ---
@@ -160,6 +164,75 @@ func _draw_new_card(p_who: Character, p_card_info: Dictionary) -> void:
 	add_child(new_card)
 	
 	_do_card_tween(new_card)
+
+
+func _new_turn() -> void:
+	await _discard_characters_cards()
+	_draw_characters_cards()
+	_action_owner = _player_obj
+
+
+func _draw_characters_cards() -> void:
+	if _player_deck.size() < _player_obj.draw_amount:
+		await _reset_deck(_player_obj)
+	
+	if _enemy_deck.size() < _enemy_obj.draw_amount:
+		await _reset_deck(_enemy_obj)
+	
+	for _i in range(0, _player_obj.draw_amount):
+		_draw_new_card(_player_obj, _player_deck.pop_front())
+	
+	for _i in range(0, _enemy_obj.draw_amount):
+		_draw_new_card(_enemy_obj, _enemy_deck.pop_front())
+
+
+func _discard_characters_cards() -> void:
+	# Avoid erros in mouse exited signal
+	for card in _player_hand_container.get_children():
+		card.prepare_to_use()
+	
+	await get_tree().create_timer(0.3).timeout
+
+	for card in _player_hand_container.get_children():
+		_player_discard_pile.append(card.get_card_data())
+		card.queue_free()
+	
+	for card in _enemy_hand_container.get_children():
+		_enemy_discard_pile.append(card.get_card_data())
+		card.queue_free()
+	
+	_player_cards_count = 0
+	_enemy_cards_count = 0
+
+
+func _reset_deck(p_who: Character) -> void:
+	var deck: Array
+	var used_pile: Array
+	
+	if p_who == _player_obj:
+		deck = _player_deck
+		used_pile = _player_discard_pile
+	
+	else:
+		deck = _enemy_deck
+		used_pile = _enemy_discard_pile
+	
+	for card in used_pile:
+		deck.append(card)
+	
+	used_pile.clear()
+	deck.shuffle()
+
+
+func _enemy_turn() -> void:
+	_action_owner = _enemy_obj
+	await get_tree().create_timer(1.0).timeout
+	
+	if _enemy_cards_count > 0:
+		var card = _enemy_hand_container.get_child(0)
+		await request_card_use(card)
+	
+	_new_turn()
 
 
 func _do_card_tween(p_card: Control) -> void:
@@ -251,6 +324,10 @@ func _on_player_card_mouse_exited(p_card: Control) -> void:
 	tween.tween_property(p_card, \"scale\", Vector2(1.0, 1.0), 0.2)
 	await tween.finished
 	p_card.z_index = 0
+
+
+func _on_end_turn_button_pressed() -> void:
+	_enemy_turn()
 "
 
 [node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck_node", "_enemy_deck_node", "_used_card_final_position")]
@@ -372,4 +449,14 @@ texture = ExtResource("8_45s5i")
 position = Vector2(246, 580)
 texture = ExtResource("9_essnk")
 
+[node name="gui" type="CanvasLayer" parent="."]
+
+[node name="end_turn_button" type="Button" parent="gui"]
+offset_left = 1051.0
+offset_top = 486.0
+offset_right = 1205.0
+offset_bottom = 548.0
+text = "End Turn"
+
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
+[connection signal="pressed" from="gui/end_turn_button" to="." method="_on_end_turn_button_pressed"]
