@@ -237,8 +237,7 @@ layout_mode = 0
 offset_left = 815.0
 offset_top = 493.0
 offset_right = 917.0
-offset_bottom = 637.0
-scale = Vector2(0.5, 0.5)
+offset_bottom = 638.0
 texture = ExtResource("2_n4edi")
 expand_mode = 1
 
@@ -325,5 +324,11 @@ position = Vector2(640, 360)
 [node name="MesaBar" type="Sprite2D" parent="."]
 position = Vector2(697, 360)
 texture = ExtResource("6_kp2p7")
+
+[node name="card" parent="." instance=ExtResource("1_sqmq8")]
+offset_left = 296.0
+offset_top = 459.0
+offset_right = 398.0
+offset_bottom = 604.0
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
