@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=3 uid="uid://c044ji1w7b04"]
+
+[sub_resource type="GDScript" id="GDScript_id8vg"]
+resource_name = "menu"
+script/source = "extends Control
+
+#--- Signals ---
+#--- Enums ---
+#--- Constants ---
+#--- Exported Variables ---
+#--- Public Variables ---
+#--- Private Variables ---
+#--- Onready Variables ---
+#--- Engine Callbacks ---
+func _ready() -> void:
+	$botao_iniciar.disabled = true
+
+
+#--- Public Functions ---
+#--- Private Functions ---
+# - Common Use Functions -
+# - Setget Functions -
+# - Signal Functions -
+
+
+func _on_texture_button_pressed():
+	pass # Replace with function body.
+"
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_id8vg")
+
+[node name="botao_iniciar" type="TextureButton" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[connection signal="pressed" from="botao_iniciar" to="." method="_on_texture_button_pressed"]
