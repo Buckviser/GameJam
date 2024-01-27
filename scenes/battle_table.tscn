@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=4 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://mm2iboy44ue3" path="res://sprites/card_back.jpg" id="2_oyqq3"]
-[ext_resource type="Texture2D" uid="uid://cvmsfurc532oc" path="res://icon.svg" id="3_covvu"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
 script/source = "extends Node2D
@@ -16,8 +15,8 @@ script/source = "extends Node2D
 @export var _card_preload: PackedScene
 @export var _enemy_hand_container: HBoxContainer
 @export var _player_hand_container: HBoxContainer
-@export var _player_deck: TextureRect
-@export var _enemy_deck: TextureRect
+@export var _player_deck_node: TextureRect
+@export var _enemy_deck_node: TextureRect
 @export var _used_card_final_position: Marker2D
 
 
@@ -30,18 +29,22 @@ var hand_container_offset := {
 	4: Vector2(387, 0), 5: Vector2(441, 0)}
 	
 var _test_card := {
-	\"card_name\": \"Card\", \"card_text\": \"Test\", \"common_humor_power\": 50,
-	\"silly_humor_power\": 40, \"agressive_humor_power\": 15
+	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.TOC_TOC,
+	\"rarity\": 1, \"cost\": 1
 }
 
 var _test_card_2 := {
-	\"card_name\": \"Card\", \"card_text\": \"Test 2\", \"common_humor_power\": 50,
-	\"silly_humor_power\": 40, \"agressive_humor_power\": 15
+	\"name\": \"Card\", \"text\": \"Test 2\", \"type\": Constants.JokesTypes.TOC_TOC,
+	\"rarity\": 1, \"cost\": 1
 }
 
 var _card_size := Vector2(104, 152)
 var _player_cards_count := 0
 var _enemy_cards_count := 0
+var _player_deck := []
+var _enemy_deck := []
+var _current_action := \"\"
+var _action_owner := \"\"
 
 
 # --- Onready Variables ---
@@ -63,6 +66,11 @@ func _input(p_event: InputEvent) -> void:
 
 
 # --- Public Functions ---
+func prepare_battle(p_player: Character, p_enemy: Character) -> void:
+	p_player.position = $player_position.position
+	p_enemy.position = $enemy_position.position
+
+
 func request_card_use(p_card: Control) -> void:
 	if p_card.card_owner == \"player\":
 		_player_cards_count -= 1
@@ -96,13 +104,13 @@ func _draw_new_card(p_who: String, p_card_info: Dictionary) -> void:
 	
 	if p_who == \"player\":
 		_player_cards_count += 1
-		used_deck = _player_deck
+		used_deck = _player_deck_node
 		new_card.card_owner = \"player\"
 		_connect_player_card_signals(new_card)
 	
 	else:
 		_enemy_cards_count += 1
-		used_deck = _enemy_deck
+		used_deck = _enemy_deck_node
 		new_card.card_owner = \"enemy\"
 	
 	new_card.position = used_deck.position
@@ -203,17 +211,12 @@ func _on_player_card_mouse_exited(p_card: Control) -> void:
 	p_card.z_index = 0
 "
 
-[sub_resource type="LabelSettings" id="LabelSettings_ajl3s"]
-font_size = 30
-
-[node name="battle_table" type="Node2D" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck", "_enemy_deck", "_used_card_final_position")]
+[node name="battle_table" type="Node2D" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_used_card_final_position")]
 script = SubResource("GDScript_si2f6")
 _card_preload = ExtResource("1_sqmq8")
 _enemy_hand_container = NodePath("enemy_hand_container")
 _player_hand_container = NodePath("player_hand_container")
-_player_deck = NodePath("player_deck")
-_enemy_deck = NodePath("enemy_deck")
-_used_card_final_position = NodePath("Marker2D")
+_used_card_final_position = NodePath("used_card_position")
 
 [node name="player_deck" type="TextureRect" parent="."]
 z_index = -2
@@ -257,35 +260,13 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Marker2D" type="Marker2D" parent="."]
+[node name="used_card_position" type="Marker2D" parent="."]
 position = Vector2(629, 333)
 
-[node name="player_sprite" type="Sprite2D" parent="."]
-position = Vector2(129, 595)
-texture = ExtResource("3_covvu")
+[node name="player_position" type="Marker2D" parent="."]
+position = Vector2(154, 601)
 
-[node name="player_name" type="Label" parent="."]
-offset_left = 40.0
-offset_top = 473.0
-offset_right = 236.0
-offset_bottom = 518.0
-text = "MatheusMDX"
-label_settings = SubResource("LabelSettings_ajl3s")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="enemy_sprite" type="Sprite2D" parent="."]
-position = Vector2(1116, 134)
-texture = ExtResource("3_covvu")
-
-[node name="enemy_name" type="Label" parent="."]
-offset_left = 1027.0
-offset_top = 13.0
-offset_right = 1223.0
-offset_bottom = 58.0
-text = "MatheusMDX"
-label_settings = SubResource("LabelSettings_ajl3s")
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="enemy_position" type="Marker2D" parent="."]
+position = Vector2(1128, 102)
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]

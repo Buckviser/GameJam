@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://c282fg8ptxd2n"]
+
+[ext_resource type="Script" path="res://scripts/character.gd" id="1_4erv5"]
+[ext_resource type="Texture2D" uid="uid://cvmsfurc532oc" path="res://icon.svg" id="2_ewkfj"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_11p1o"]
+
+[node name="player" type="Node2D"]
+script = ExtResource("1_4erv5")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_ewkfj")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -66.0
+offset_top = -96.0
+offset_right = 66.0
+offset_bottom = -73.0
+label_settings = SubResource("LabelSettings_11p1o")
+horizontal_alignment = 1
+vertical_alignment = 1
