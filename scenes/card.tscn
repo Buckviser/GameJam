@@ -115,7 +115,7 @@ func _invert_card(p_time: float = 0.0) -> void:
 [sub_resource type="LabelSettings" id="LabelSettings_bqoeu"]
 font_size = 12
 
-[node name="card" type="Control" node_paths=PackedStringArray("_card_description", "_card_background", "_card_rarity", "_card_info", "_card_type")]
+[node name="card" type="Control" node_paths=PackedStringArray("_card_description_label", "_card_back_node", "_card_rarity_node", "_card_layout_node", "_card_type_node")]
 custom_minimum_size = Vector2(102, 145)
 layout_mode = 3
 anchors_preset = 0
