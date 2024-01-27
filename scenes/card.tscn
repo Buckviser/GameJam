@@ -1,0 +1,176 @@
+[gd_scene load_steps=7 format=3 uid="uid://d3we480ibjoa8"]
+
+[ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="1_u8s0t"]
+[ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="3_8edwt"]
+[ext_resource type="Texture2D" uid="uid://b0cyfn1734cgu" path="res://sprites/Layout_Cartas.png" id="4_hva5v"]
+[ext_resource type="Texture2D" uid="uid://2xx4gw3rqnlw" path="res://sprites/Tipo_de_Piada_-_Toc_Toc.png" id="5_ju462"]
+
+[sub_resource type="GDScript" id="GDScript_67sht"]
+script/source = "extends Control
+
+# --- Signals ---
+signal flip_finished
+
+
+# --- Enums ---
+# --- Constants ---
+
+
+# --- Exported Variables ---
+@export var _front_texture: Texture2D = null
+@export var _back_texture: Texture2D = preload(\"res://sprites/card_back.jpg\")
+@export var _card_description: Label
+@export var _card_background: TextureRect
+@export var _card_rarity: TextureRect
+@export var _card_info: TextureRect
+@export var _card_type: TextureRect
+
+
+# --- Public Variables ---
+var is_on_hand := false
+var card_owner: String
+
+
+# --- Private Variables ---
+var _card_name: String
+var _card_text: String
+var _common_humor_power := 0
+var _silly_humor_power := 0
+var _agressive_humor_power := 0
+var _flip_side := 0
+
+
+# --- Onready Variables ---
+
+
+# --- Engine Callbacks ---
+func _ready() -> void:
+	#$background.texture = 
+	pass
+
+
+# --- Public Functions ---
+func set_card_to(p_dict_info: Dictionary) -> void:
+	_card_name = p_dict_info[\"card_name\"]
+	_card_text = p_dict_info[\"card_text\"]
+	
+	_common_humor_power = p_dict_info[\"common_humor_power\"]
+	_silly_humor_power =  p_dict_info[\"silly_humor_power\"]
+	_agressive_humor_power = p_dict_info[\"agressive_humor_power\"]
+	
+	_card_description.text = _card_text
+
+
+func prepare_to_use() -> void:
+	is_on_hand = false
+	
+	var tween = create_tween()
+	tween.tween_property(self, \"scale\", Vector2(1.0, 1.0), 0.2)
+
+
+func flip(p_immediatly := false) -> void:
+	if p_immediatly == false:
+		var tween = create_tween()
+		tween.tween_property(self, \"scale\", Vector2(0, 1), 0.15)
+		await tween.finished
+	
+	if _flip_side == 0:
+		_card_background.visible = false
+		
+		_card_rarity.visible = true
+		_card_info.visible = true
+		_card_type.visible = true
+		
+		_flip_side = 1
+		
+	
+	else:
+		_card_background.visible = true
+		
+		_card_rarity.visible = false
+		_card_info.visible = false
+		_card_type.visible = false
+		
+		_flip_side = 1
+	
+	if p_immediatly == false:
+		var tween = create_tween()
+		tween.tween_property(self, \"scale\", Vector2(1, 1), 0.15)
+	
+	emit_signal(\"flip_finished\")
+
+
+func _invert_card(p_time: float = 0.0) -> void:
+	pass 
+
+
+# --- Private Functions ---
+# - Common Use Functions -
+# - Setget Functions -
+# - Signal Functions -
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_bqoeu"]
+font_size = 12
+
+[node name="card" type="Control" node_paths=PackedStringArray("_card_description", "_card_background", "_card_rarity", "_card_info", "_card_type")]
+custom_minimum_size = Vector2(102, 144)
+layout_mode = 3
+anchors_preset = 0
+offset_left = -51.0
+offset_top = -72.0
+offset_right = 51.0
+offset_bottom = 72.0
+pivot_offset = Vector2(52, 76)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = SubResource("GDScript_67sht")
+_front_texture = ExtResource("1_u8s0t")
+_card_description = NodePath("info_window/card_description")
+_card_background = NodePath("background")
+_card_rarity = NodePath("rarity")
+_card_info = NodePath("info_window")
+_card_type = NodePath("type")
+
+[node name="background" type="TextureRect" parent="."]
+visible = false
+custom_minimum_size = Vector2(102, 144)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+pivot_offset = Vector2(51, 72)
+texture = ExtResource("1_u8s0t")
+expand_mode = 1
+
+[node name="rarity" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 102.0
+offset_bottom = 144.0
+texture = ExtResource("3_8edwt")
+expand_mode = 1
+
+[node name="info_window" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 102.0
+offset_bottom = 144.0
+texture = ExtResource("4_hva5v")
+expand_mode = 1
+
+[node name="card_description" type="Label" parent="info_window"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 83.0
+offset_right = 92.0
+offset_bottom = 135.0
+label_settings = SubResource("LabelSettings_bqoeu")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+clip_text = true
+
+[node name="type" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 102.0
+offset_bottom = 144.0
+texture = ExtResource("5_ju462")
+expand_mode = 1

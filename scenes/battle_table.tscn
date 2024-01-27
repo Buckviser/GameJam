@@ -1,0 +1,291 @@
+[gd_scene load_steps=6 format=3 uid="uid://1elqayaj0cj6"]
+
+[ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
+[ext_resource type="Texture2D" uid="uid://mm2iboy44ue3" path="res://sprites/card_back.jpg" id="2_oyqq3"]
+[ext_resource type="Texture2D" uid="uid://cvmsfurc532oc" path="res://icon.svg" id="3_covvu"]
+
+[sub_resource type="GDScript" id="GDScript_si2f6"]
+script/source = "extends Node2D
+
+# --- Signals ---
+# --- Enums ---
+# --- Constants ---
+
+
+# --- Exported Variables ---
+@export var _card_preload: PackedScene
+@export var _enemy_hand_container: HBoxContainer
+@export var _player_hand_container: HBoxContainer
+@export var _player_deck: TextureRect
+@export var _enemy_deck: TextureRect
+@export var _used_card_final_position: Marker2D
+
+
+# --- Public Variables ---
+
+
+# --- Private Variables ---
+var hand_container_offset := {
+	1: Vector2(225, 0), 2: Vector2(279, 0), 3: Vector2(333, 0), 
+	4: Vector2(387, 0), 5: Vector2(441, 0)}
+	
+var _test_card := {
+	\"card_name\": \"Card\", \"card_text\": \"Test\", \"common_humor_power\": 50,
+	\"silly_humor_power\": 40, \"agressive_humor_power\": 15
+}
+
+var _test_card_2 := {
+	\"card_name\": \"Card\", \"card_text\": \"Test 2\", \"common_humor_power\": 50,
+	\"silly_humor_power\": 40, \"agressive_humor_power\": 15
+}
+
+var _card_size := Vector2(104, 152)
+var _player_cards_count := 0
+var _enemy_cards_count := 0
+
+
+# --- Onready Variables ---
+
+
+# --- Engine Callbacks ---
+func _ready() -> void:
+	add_to_group(\"battle_table\")
+
+
+func _input(p_event: InputEvent) -> void:
+	if p_event is InputEventKey and p_event.is_pressed():
+		if p_event.keycode == KEY_SPACE and _enemy_cards_count < 5:
+			_draw_new_card(\"enemy\", _test_card_2)
+		
+		elif p_event.keycode == KEY_Z and _enemy_cards_count > 0:
+			var card = _enemy_hand_container.get_child(0)
+			request_card_use(card)
+
+
+# --- Public Functions ---
+func request_card_use(p_card: Control) -> void:
+	if p_card.card_owner == \"player\":
+		_player_cards_count -= 1
+		_disconnect_player_card_signals(p_card)
+	
+	else:
+#		var flip_tween = create_tween()
+#		flip_tween.tween_property(p_card, \"rotation\", 0, 0.3)
+		_enemy_cards_count -= 1
+	
+	p_card.z_index = 3
+	p_card.prepare_to_use()
+	p_card.reparent($used_cards_pile)
+	
+	var tween = create_tween()
+	tween.tween_property(p_card, \"global_position\", 
+			_used_card_final_position.global_position, 0.3)
+	
+	await tween.finished
+	p_card.z_index = 0
+	
+	if p_card.card_owner != \"player\":
+		p_card.flip()
+
+
+# --- Private Functions ---
+# - Common Use Functions -
+func _draw_new_card(p_who: String, p_card_info: Dictionary) -> void:
+	var new_card = _card_preload.instantiate()
+	var used_deck
+	
+	if p_who == \"player\":
+		_player_cards_count += 1
+		used_deck = _player_deck
+		new_card.card_owner = \"player\"
+		_connect_player_card_signals(new_card)
+	
+	else:
+		_enemy_cards_count += 1
+		used_deck = _enemy_deck
+		new_card.card_owner = \"enemy\"
+	
+	new_card.position = used_deck.position
+	new_card.rotation = used_deck.rotation
+	new_card.set_card_to(p_card_info)
+	add_child(new_card)
+	
+	_do_card_tween(new_card)
+
+
+func _do_card_tween(p_card: Control) -> void:
+	var first_position: Vector2
+	var final_position: Vector2
+	var container: HBoxContainer
+	
+	if p_card.card_owner == \"player\":
+		first_position = Vector2(1330, 500)
+		final_position = _player_hand_container.global_position + hand_container_offset[_player_cards_count]
+		container = _player_hand_container
+	
+	else:
+		first_position = Vector2(-298, 34)
+		final_position = _enemy_hand_container.global_position + hand_container_offset[_enemy_cards_count]
+		container = _enemy_hand_container
+	
+	var tween = create_tween()
+	tween.tween_property(p_card, \"position\", first_position, 0.4)
+	await tween.finished
+	
+	if p_card.card_owner == \"player\":
+		p_card.flip(true)
+	
+	tween = create_tween()
+	tween.tween_property(p_card, \"position\", final_position, 0.5)
+	p_card.z_index = 0
+	await tween.finished
+	p_card.reparent(container)
+	
+	if p_card.card_owner == \"player\":
+		p_card.is_on_hand = true
+
+
+func _connect_player_card_signals(p_card: Control) -> void:
+	p_card.gui_input.connect(_on_player_card_gui_input.bind(p_card))
+	p_card.mouse_entered.connect(_on_player_card_mouse_entered.bind(p_card))
+	p_card.mouse_exited.connect(_on_player_card_mouse_exited.bind(p_card))
+
+
+func _disconnect_player_card_signals(p_card: Control) -> void:
+	p_card.gui_input.disconnect(_on_player_card_gui_input)
+	p_card.mouse_entered.disconnect(_on_player_card_mouse_entered)
+	p_card.mouse_exited.disconnect(_on_player_card_mouse_exited)
+
+
+# - Setget Functions -
+
+
+# - Signal Functions -
+func _on_deck_gui_input(p_event: InputEvent) -> void:
+	if p_event is InputEventMouseButton and p_event.is_pressed():
+		if p_event.button_index == MOUSE_BUTTON_LEFT and _player_cards_count < 5:
+			_draw_new_card(\"player\", _test_card)
+
+
+func _on_player_card_gui_input(p_event: InputEvent, p_card: Control) -> void:
+	if p_card.is_on_hand == false:
+		return
+	
+	if p_event is InputEventMouseButton:
+		if p_event.button_index == MOUSE_BUTTON_LEFT and p_event.pressed:
+			request_card_use(p_card)
+
+
+func _on_player_card_mouse_entered(p_card: Control) -> void:
+	if p_card.is_on_hand == false:
+		return
+	
+	for card in _player_hand_container.get_children():
+		if card != p_card:
+			card.z_index = 0
+		
+		else:
+			card.z_index = 3
+	
+	var tween = create_tween()
+	tween.tween_property(p_card, \"scale\", Vector2(1.5, 1.5), 0.2)
+	await tween.finished
+	p_card.z_index = 3
+
+
+func _on_player_card_mouse_exited(p_card: Control) -> void:
+	if p_card.is_on_hand == false:
+		return
+	
+	var tween = create_tween()
+	tween.tween_property(p_card, \"scale\", Vector2(1.0, 1.0), 0.2)
+	await tween.finished
+	p_card.z_index = 0
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_ajl3s"]
+font_size = 30
+
+[node name="battle_table" type="Node2D" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck", "_enemy_deck", "_used_card_final_position")]
+script = SubResource("GDScript_si2f6")
+_card_preload = ExtResource("1_sqmq8")
+_enemy_hand_container = NodePath("enemy_hand_container")
+_player_hand_container = NodePath("player_hand_container")
+_player_deck = NodePath("player_deck")
+_enemy_deck = NodePath("enemy_deck")
+_used_card_final_position = NodePath("Marker2D")
+
+[node name="player_deck" type="TextureRect" parent="."]
+z_index = -2
+offset_left = 1072.0
+offset_top = 454.0
+offset_right = 1174.0
+offset_bottom = 598.0
+texture = ExtResource("2_oyqq3")
+expand_mode = 1
+
+[node name="enemy_deck" type="TextureRect" parent="."]
+z_index = -2
+offset_left = 148.0
+offset_top = 72.0
+offset_right = 250.0
+offset_bottom = 216.0
+texture = ExtResource("2_oyqq3")
+expand_mode = 1
+
+[node name="player_hand_container" type="HBoxContainer" parent="."]
+offset_left = 339.0
+offset_top = 507.0
+offset_right = 894.0
+offset_bottom = 673.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="enemy_hand_container" type="HBoxContainer" parent="."]
+offset_left = 369.0
+offset_top = 26.0
+offset_right = 924.0
+offset_bottom = 192.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="used_cards_pile" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(629, 333)
+
+[node name="player_sprite" type="Sprite2D" parent="."]
+position = Vector2(129, 595)
+texture = ExtResource("3_covvu")
+
+[node name="player_name" type="Label" parent="."]
+offset_left = 40.0
+offset_top = 473.0
+offset_right = 236.0
+offset_bottom = 518.0
+text = "MatheusMDX"
+label_settings = SubResource("LabelSettings_ajl3s")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="enemy_sprite" type="Sprite2D" parent="."]
+position = Vector2(1116, 134)
+texture = ExtResource("3_covvu")
+
+[node name="enemy_name" type="Label" parent="."]
+offset_left = 1027.0
+offset_top = 13.0
+offset_right = 1223.0
+offset_bottom = 58.0
+text = "MatheusMDX"
+label_settings = SubResource("LabelSettings_ajl3s")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
