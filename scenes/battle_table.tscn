@@ -1,13 +1,15 @@
-[gd_scene load_steps=7 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=9 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
+[ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="2_n4edi"]
 [ext_resource type="Texture2D" uid="uid://mm2iboy44ue3" path="res://sprites/card_back.jpg" id="2_oyqq3"]
-[ext_resource type="Texture2D" uid="uid://dqofmxddbyrl6" path="res://sprites/Mesa.png" id="4_yerso"]
 [ext_resource type="Texture2D" uid="uid://bb5v17h82eb6u" path="res://sprites/Player.png" id="5_f22fu"]
+[ext_resource type="Texture2D" uid="uid://b1e4xfiddc4jo" path="res://sprites/cenario.png" id="6_6u686"]
+[ext_resource type="Texture2D" uid="uid://x5c24tyujtj7" path="res://sprites/mesa_bar.png" id="6_kp2p7"]
 [ext_resource type="Texture2D" uid="uid://c6kvxsdgcosc3" path="res://sprites/Enemy.png" id="6_qqw5o"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
-script/source = "extends Node2D
+script/source = "extends Control
 
 # --- Signals ---
 # --- Enums ---
@@ -214,46 +216,56 @@ func _on_player_card_mouse_exited(p_card: Control) -> void:
 	p_card.z_index = 0
 "
 
-[node name="battle_table" type="Node2D" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck", "_enemy_deck", "_used_card_final_position")]
+[node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck", "_enemy_deck", "_used_card_final_position")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
 script = SubResource("GDScript_si2f6")
 _card_preload = ExtResource("1_sqmq8")
 _enemy_hand_container = NodePath("enemy_hand_container")
 _player_hand_container = NodePath("player_hand_container")
-_used_card_final_position = NodePath("used_card_position")
+_player_deck = NodePath("player_deck")
+_enemy_deck = NodePath("enemy_deck")
+_used_card_final_position = NodePath("Marker2D")
+metadata/_edit_lock_ = true
+
 
 [node name="player_deck" type="TextureRect" parent="."]
 z_index = 1
-offset_left = 950.0
-offset_top = 400.0
-offset_right = 1052.0
-offset_bottom = 544.0
-texture = ExtResource("2_oyqq3")
+offset_left = 815.0
+offset_top = 493.0
+offset_right = 917.0
+offset_bottom = 637.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_n4edi")
 expand_mode = 1
 
 [node name="enemy_deck" type="TextureRect" parent="."]
 z_index = 1
-offset_left = 258.0
-offset_top = 300.0
-offset_right = 360.0
-offset_bottom = 444.0
+offset_left = -599.0
+offset_top = -19.0
+offset_right = -497.0
+offset_bottom = 125.0
 texture = ExtResource("2_oyqq3")
 expand_mode = 1
 
 [node name="player_hand_container" type="HBoxContainer" parent="."]
 z_index = 2
-offset_left = 175.0
-offset_top = 557.0
-offset_right = 687.0
-offset_bottom = 690.0
+offset_left = 668.0
+offset_top = 574.0
+offset_right = 1180.0
+offset_bottom = 707.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
 
 [node name="enemy_hand_container" type="HBoxContainer" parent="."]
-offset_left = 568.0
-offset_top = 30.0
-offset_right = 1123.0
-offset_bottom = 196.0
+offset_left = -457.0
+offset_top = 14.0
+offset_right = -149.0
+offset_bottom = 110.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
@@ -271,23 +283,44 @@ gizmo_extents = 0.0
 
 [node name="Player" type="Sprite2D" parent="."]
 z_index = 1
-position = Vector2(846, 634)
-scale = Vector2(8.414, 6.571)
+position = Vector2(600, 656)
+scale = Vector2(5, 5)
 texture = ExtResource("5_f22fu")
 hframes = 5
 vframes = 3
 
-[node name="table_sprite" type="Sprite2D" parent="."]
-position = Vector2(648, 391)
-scale = Vector2(9.42035, 7.83607)
-texture = ExtResource("4_yerso")
-
 [node name="Enemy" type="Sprite2D" parent="."]
 z_index = -1
-position = Vector2(381, 143)
-scale = Vector2(8.41364, 6.57143)
+position = Vector2(770, 355)
+scale = Vector2(5, 5)
 texture = ExtResource("6_qqw5o")
 hframes = 5
 vframes = 3
+
+[node name="Cenario" type="TextureRect" parent="."]
+z_index = -2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("6_6u686")
+metadata/_edit_lock_ = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="MesaBar" type="Sprite2D" parent="."]
+position = Vector2(697, 360)
+texture = ExtResource("6_kp2p7")
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
