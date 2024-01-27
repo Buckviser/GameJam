@@ -32,7 +32,7 @@ signal flip_finished
 
 # --- Public Variables ---
 var is_on_hand := false
-var card_owner: String
+var card_owner: Character
 
 
 # --- Private Variables ---
@@ -61,6 +61,17 @@ func set_card_to(p_dict_info: Dictionary) -> void:
 	_card_rarity = p_dict_info[\"rarity\"]
 	
 	_card_description_label.text = _card_text
+
+
+func get_card_data() -> Dictionary:
+	var dict := {}
+	dict[\"name\"] = _card_name
+	dict[\"text\"] = _card_text
+	dict[\"type\"] = _card_type
+	dict[\"cost\"] = _card_cost
+	dict[\"rarity\"] = _card_rarity
+	
+	return dict
 
 
 func prepare_to_use() -> void:

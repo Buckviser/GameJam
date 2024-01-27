@@ -6,18 +6,18 @@ class_name Character
 # --- Enums ---
 # --- Constants ---
 # --- Exported Variables ---
+
+
 # --- Public Variables ---
+var player_name: String = "Matheus"
+var resistences := {}
+var draw_amount := 3
+var max_locks := 1
+var locks_remaining: int
+var deck: Array
 
 
 # --- Private Variables ---
-var _player_name: String = "Matheus"
-var _player_resistences := {}
-var _draw_amount := 3
-var _max_locks := 1
-var _locks_remaining: int
-var _player_deck: Array
-
-
 # --- Onready Variables ---
 
 
@@ -27,23 +27,19 @@ func _ready() -> void:
 
 
 # --- Public Functions ---
-func get_player_resistences() -> Dictionary:
-	return _player_resistences
-
-
 func new_battle_preparations() -> void:
-	_locks_remaining = _max_locks
+	locks_remaining = max_locks
 
 
 func load_player_data(p_data: Dictionary) -> void:
-	_player_name = p_data["name"]
-	_player_resistences = p_data["resistences"]
-	_draw_amount = p_data["draw_amount"]
-	_max_locks = p_data["max_locks"]
-	_player_deck = p_data["deck"]
+	player_name = p_data["name"]
+	resistences = p_data["resistences"]
+	draw_amount = p_data["draw_amount"]
+	max_locks = p_data["max_locks"]
+	deck = p_data["deck"]
 	
-	_locks_remaining = _max_locks
-	$Label.text = _player_name
+	locks_remaining = max_locks
+	$Label.text = player_name
 
 
 # --- Private Functions ---
