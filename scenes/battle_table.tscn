@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=10 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="2_n4edi"]
@@ -7,8 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://b1e4xfiddc4jo" path="res://sprites/cenario.png" id="6_6u686"]
 [ext_resource type="Texture2D" uid="uid://x5c24tyujtj7" path="res://sprites/mesa_bar.png" id="6_kp2p7"]
 [ext_resource type="Texture2D" uid="uid://c6kvxsdgcosc3" path="res://sprites/Enemy.png" id="6_qqw5o"]
-[ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="8_45s5i"]
-[ext_resource type="Texture2D" uid="uid://b0cyfn1734cgu" path="res://sprites/Layout_Cartas.png" id="9_essnk"]
+[ext_resource type="PackedScene" uid="uid://dhrjxh63i1mpt" path="res://scenes/inimigo.tscn" id="8_vvubg"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
 script/source = "extends Control
@@ -328,12 +327,7 @@ position = Vector2(640, 360)
 position = Vector2(697, 360)
 texture = ExtResource("6_kp2p7")
 
-[node name="RaridadeCartas-Ouro" type="Sprite2D" parent="."]
-position = Vector2(245, 580)
-texture = ExtResource("8_45s5i")
-
-[node name="LayoutCartas" type="Sprite2D" parent="."]
-position = Vector2(246, 580)
-texture = ExtResource("9_essnk")
+[node name="Node2D" parent="." instance=ExtResource("8_vvubg")]
+position = Vector2(422, 309)
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]

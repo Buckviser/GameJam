@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3 uid="uid://dhrjxh63i1mpt"]
+
+[ext_resource type="Texture2D" uid="uid://c6kvxsdgcosc3" path="res://sprites/Enemy.png" id="1_x68iv"]
+
+[sub_resource type="Animation" id="Animation_3ojgs"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("EnemyStyle1:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_kbbvd"]
+resource_name = "animacao_vitoria_enemy"
+length = 1.5
+loop_mode = 1
+step = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("EnemyStyle1:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [1, 2, 3, 4, 5]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qtdux"]
+_data = {
+"RESET": SubResource("Animation_3ojgs"),
+"animacao_vitoria_enemy": SubResource("Animation_kbbvd")
+}
+
+[node name="Node2D" type="Node2D"]
+
+[node name="EnemyStyle1" type="Sprite2D" parent="."]
+texture = ExtResource("1_x68iv")
+hframes = 5
+vframes = 3
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_qtdux")
+}
