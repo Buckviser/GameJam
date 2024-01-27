@@ -17,13 +17,17 @@ signal flip_finished
 
 
 # --- Exported Variables ---
-@export var _front_texture: Texture2D = null
-@export var _back_texture: Texture2D = preload(\"res://sprites/card_back.jpg\")
-@export var _card_description: Label
-@export var _card_background: TextureRect
-@export var _card_rarity: TextureRect
-@export var _card_info: TextureRect
-@export var _card_type: TextureRect
+@export var _back_card_texture: Texture2D
+@export var _gold_card_texture: Texture2D
+@export var _silver_card_texture: Texture2D
+@export var _bronze_card_texture: Texture2D
+
+
+@export var _card_description_label: Label
+@export var _card_back_node: TextureRect
+@export var _card_rarity_node: TextureRect
+@export var _card_layout_node: TextureRect
+@export var _card_type_node: TextureRect
 
 
 # --- Public Variables ---
@@ -34,9 +38,9 @@ var card_owner: String
 # --- Private Variables ---
 var _card_name: String
 var _card_text: String
-var _common_humor_power := 0
-var _silly_humor_power := 0
-var _agressive_humor_power := 0
+var _card_type: String
+var _card_cost := 1
+var _card_rarity := 1
 var _flip_side := 0
 
 
@@ -45,20 +49,18 @@ var _flip_side := 0
 
 # --- Engine Callbacks ---
 func _ready() -> void:
-	#$background.texture = 
 	pass
 
 
 # --- Public Functions ---
 func set_card_to(p_dict_info: Dictionary) -> void:
-	_card_name = p_dict_info[\"card_name\"]
-	_card_text = p_dict_info[\"card_text\"]
+	_card_name = p_dict_info[\"name\"]
+	_card_text = p_dict_info[\"text\"]
+	_card_type = p_dict_info[\"type\"]
+	_card_cost = p_dict_info[\"cost\"]
+	_card_rarity = p_dict_info[\"rarity\"]
 	
-	_common_humor_power = p_dict_info[\"common_humor_power\"]
-	_silly_humor_power =  p_dict_info[\"silly_humor_power\"]
-	_agressive_humor_power = p_dict_info[\"agressive_humor_power\"]
-	
-	_card_description.text = _card_text
+	_card_description_label.text = _card_text
 
 
 func prepare_to_use() -> void:
@@ -75,21 +77,21 @@ func flip(p_immediatly := false) -> void:
 		await tween.finished
 	
 	if _flip_side == 0:
-		_card_background.visible = false
+		_card_back_node.visible = false
 		
-		_card_rarity.visible = true
-		_card_info.visible = true
-		_card_type.visible = true
+		_card_rarity_node.visible = true
+		_card_layout_node.visible = true
+		_card_type_node.visible = true
 		
 		_flip_side = 1
 		
 	
 	else:
-		_card_background.visible = true
+		_card_back_node.visible = true
 		
-		_card_rarity.visible = false
-		_card_info.visible = false
-		_card_type.visible = false
+		_card_rarity_node.visible = false
+		_card_layout_node.visible = false
+		_card_type_node.visible = false
 		
 		_flip_side = 1
 	
@@ -125,15 +127,15 @@ pivot_offset = Vector2(52, 76)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = SubResource("GDScript_67sht")
-_front_texture = ExtResource("1_u8s0t")
-_card_description = NodePath("info_window/card_description")
-_card_background = NodePath("background")
-_card_rarity = NodePath("rarity")
-_card_info = NodePath("info_window")
-_card_type = NodePath("type")
+_back_card_texture = ExtResource("1_u8s0t")
+_gold_card_texture = ExtResource("3_8edwt")
+_card_description_label = NodePath("info_window/card_description")
+_card_back_node = NodePath("back")
+_card_rarity_node = NodePath("rarity")
+_card_layout_node = NodePath("info_window")
+_card_type_node = NodePath("type")
 
-[node name="background" type="TextureRect" parent="."]
-visible = false
+[node name="back" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(102, 144)
 layout_mode = 0
 offset_right = 102.0
@@ -143,6 +145,7 @@ texture = ExtResource("1_u8s0t")
 expand_mode = 1
 
 [node name="rarity" type="TextureRect" parent="."]
+visible = false
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0
@@ -150,6 +153,7 @@ texture = ExtResource("3_8edwt")
 expand_mode = 1
 
 [node name="info_window" type="TextureRect" parent="."]
+visible = false
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0
@@ -169,6 +173,7 @@ autowrap_mode = 3
 clip_text = true
 
 [node name="type" type="TextureRect" parent="."]
+visible = false
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0

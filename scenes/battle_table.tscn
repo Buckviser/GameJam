@@ -20,8 +20,8 @@ script/source = "extends Control
 @export var _card_preload: PackedScene
 @export var _enemy_hand_container: HBoxContainer
 @export var _player_hand_container: HBoxContainer
-@export var _player_deck: TextureRect
-@export var _enemy_deck: TextureRect
+@export var _player_deck_node: TextureRect
+@export var _enemy_deck_node: TextureRect
 @export var _used_card_final_position: Marker2D
 
 
@@ -34,18 +34,22 @@ var hand_container_offset := {
 	4: Vector2(387, 0), 5: Vector2(441, 0)}
 	
 var _test_card := {
-	\"card_name\": \"Card\", \"card_text\": \"Test\", \"common_humor_power\": 50,
-	\"silly_humor_power\": 40, \"agressive_humor_power\": 15
+	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.TOC_TOC,
+	\"rarity\": 1, \"cost\": 1
 }
 
 var _test_card_2 := {
-	\"card_name\": \"Card\", \"card_text\": \"Test 2\", \"common_humor_power\": 50,
-	\"silly_humor_power\": 40, \"agressive_humor_power\": 15
+	\"name\": \"Card\", \"text\": \"Test 2\", \"type\": Constants.JokesTypes.TOC_TOC,
+	\"rarity\": 1, \"cost\": 1
 }
 
 var _card_size := Vector2(104, 152)
 var _player_cards_count := 0
 var _enemy_cards_count := 0
+var _player_deck := []
+var _enemy_deck := []
+var _current_action := \"\"
+var _action_owner := \"\"
 
 
 # --- Onready Variables ---
@@ -67,6 +71,11 @@ func _input(p_event: InputEvent) -> void:
 
 
 # --- Public Functions ---
+func prepare_battle(p_player: Character, p_enemy: Character) -> void:
+	p_player.position = $player_position.position
+	p_enemy.position = $enemy_position.position
+
+
 func request_card_use(p_card: Control) -> void:
 	if p_card.card_owner == \"player\":
 		_player_cards_count -= 1
@@ -100,13 +109,13 @@ func _draw_new_card(p_who: String, p_card_info: Dictionary) -> void:
 	
 	if p_who == \"player\":
 		_player_cards_count += 1
-		used_deck = _player_deck
+		used_deck = _player_deck_node
 		new_card.card_owner = \"player\"
 		_connect_player_card_signals(new_card)
 	
 	else:
 		_enemy_cards_count += 1
-		used_deck = _enemy_deck
+		used_deck = _enemy_deck_node
 		new_card.card_owner = \"enemy\"
 	
 	new_card.position = used_deck.position
@@ -221,6 +230,7 @@ _player_deck = NodePath("player_deck")
 _enemy_deck = NodePath("enemy_deck")
 _used_card_final_position = NodePath("Marker2D")
 metadata/_edit_lock_ = true
+
 
 [node name="player_deck" type="TextureRect" parent="."]
 z_index = 1
