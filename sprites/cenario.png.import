@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqofmxddbyrl6"
-path="res://.godot/imported/Mesa.png-d10c0c0c7929dd6597eda24ac9c724b0.ctex"
+uid="uid://b1e4xfiddc4jo"
+path="res://.godot/imported/cenario.png-3bc7fd673230d74152f1e1eee72642fb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/Mesa.png"
-dest_files=["res://.godot/imported/Mesa.png-d10c0c0c7929dd6597eda24ac9c724b0.ctex"]
+source_file="res://sprites/cenario.png"
+dest_files=["res://.godot/imported/cenario.png-3bc7fd673230d74152f1e1eee72642fb.ctex"]
 
 [params]
 

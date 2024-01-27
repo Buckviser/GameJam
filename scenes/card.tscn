@@ -114,7 +114,7 @@ func _invert_card(p_time: float = 0.0) -> void:
 font_size = 12
 
 [node name="card" type="Control" node_paths=PackedStringArray("_card_description", "_card_background", "_card_rarity", "_card_info", "_card_type")]
-custom_minimum_size = Vector2(102, 144)
+custom_minimum_size = Vector2(102, 145)
 layout_mode = 3
 anchors_preset = 0
 offset_left = -51.0
@@ -136,8 +136,8 @@ _card_type = NodePath("type")
 visible = false
 custom_minimum_size = Vector2(102, 144)
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 102.0
+offset_bottom = 145.0
 pivot_offset = Vector2(51, 72)
 texture = ExtResource("1_u8s0t")
 expand_mode = 1
@@ -145,14 +145,14 @@ expand_mode = 1
 [node name="rarity" type="TextureRect" parent="."]
 layout_mode = 0
 offset_right = 102.0
-offset_bottom = 144.0
+offset_bottom = 145.0
 texture = ExtResource("3_8edwt")
 expand_mode = 1
 
 [node name="info_window" type="TextureRect" parent="."]
 layout_mode = 0
 offset_right = 102.0
-offset_bottom = 144.0
+offset_bottom = 145.0
 texture = ExtResource("4_hva5v")
 expand_mode = 1
 
@@ -171,6 +171,6 @@ clip_text = true
 [node name="type" type="TextureRect" parent="."]
 layout_mode = 0
 offset_right = 102.0
-offset_bottom = 144.0
+offset_bottom = 145.0
 texture = ExtResource("5_ju462")
 expand_mode = 1
