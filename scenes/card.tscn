@@ -32,7 +32,7 @@ signal flip_finished
 
 # --- Public Variables ---
 var is_on_hand := false
-var card_owner: String
+var card_owner: Character
 
 
 # --- Private Variables ---
