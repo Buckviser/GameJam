@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=8 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="2_n4edi"]
