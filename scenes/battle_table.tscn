@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=7 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://mm2iboy44ue3" path="res://sprites/card_back.jpg" id="2_oyqq3"]
-[ext_resource type="Texture2D" uid="uid://cvmsfurc532oc" path="res://icon.svg" id="3_covvu"]
+[ext_resource type="Texture2D" uid="uid://dqofmxddbyrl6" path="res://sprites/Mesa.png" id="4_yerso"]
+[ext_resource type="Texture2D" uid="uid://bb5v17h82eb6u" path="res://sprites/Player.png" id="5_f22fu"]
+[ext_resource type="Texture2D" uid="uid://c6kvxsdgcosc3" path="res://sprites/Enemy.png" id="6_qqw5o"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
 script/source = "extends Node2D
@@ -203,9 +205,6 @@ func _on_player_card_mouse_exited(p_card: Control) -> void:
 	p_card.z_index = 0
 "
 
-[sub_resource type="LabelSettings" id="LabelSettings_ajl3s"]
-font_size = 30
-
 [node name="battle_table" type="Node2D" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck", "_enemy_deck", "_used_card_final_position")]
 script = SubResource("GDScript_si2f6")
 _card_preload = ExtResource("1_sqmq8")
@@ -216,37 +215,38 @@ _enemy_deck = NodePath("enemy_deck")
 _used_card_final_position = NodePath("Marker2D")
 
 [node name="player_deck" type="TextureRect" parent="."]
-z_index = -2
-offset_left = 1072.0
-offset_top = 454.0
-offset_right = 1174.0
-offset_bottom = 598.0
+z_index = 1
+offset_left = 950.0
+offset_top = 400.0
+offset_right = 1052.0
+offset_bottom = 544.0
 texture = ExtResource("2_oyqq3")
 expand_mode = 1
 
 [node name="enemy_deck" type="TextureRect" parent="."]
-z_index = -2
-offset_left = 148.0
-offset_top = 72.0
-offset_right = 250.0
-offset_bottom = 216.0
+z_index = 1
+offset_left = 258.0
+offset_top = 300.0
+offset_right = 360.0
+offset_bottom = 444.0
 texture = ExtResource("2_oyqq3")
 expand_mode = 1
 
 [node name="player_hand_container" type="HBoxContainer" parent="."]
-offset_left = 339.0
-offset_top = 507.0
-offset_right = 894.0
-offset_bottom = 673.0
+z_index = 2
+offset_left = 175.0
+offset_top = 557.0
+offset_right = 687.0
+offset_bottom = 690.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
 
 [node name="enemy_hand_container" type="HBoxContainer" parent="."]
-offset_left = 369.0
-offset_top = 26.0
-offset_right = 924.0
-offset_bottom = 192.0
+offset_left = 568.0
+offset_top = 30.0
+offset_right = 1123.0
+offset_bottom = 196.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
@@ -258,34 +258,29 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Marker2D" type="Marker2D" parent="."]
+z_index = 1
 position = Vector2(629, 333)
+gizmo_extents = 0.0
 
-[node name="player_sprite" type="Sprite2D" parent="."]
-position = Vector2(129, 595)
-texture = ExtResource("3_covvu")
+[node name="Player" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(846, 634)
+scale = Vector2(8.414, 6.571)
+texture = ExtResource("5_f22fu")
+hframes = 5
+vframes = 3
 
-[node name="player_name" type="Label" parent="."]
-offset_left = 40.0
-offset_top = 473.0
-offset_right = 236.0
-offset_bottom = 518.0
-text = "MatheusMDX"
-label_settings = SubResource("LabelSettings_ajl3s")
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="table_sprite" type="Sprite2D" parent="."]
+position = Vector2(648, 391)
+scale = Vector2(9.42035, 7.83607)
+texture = ExtResource("4_yerso")
 
-[node name="enemy_sprite" type="Sprite2D" parent="."]
-position = Vector2(1116, 134)
-texture = ExtResource("3_covvu")
-
-[node name="enemy_name" type="Label" parent="."]
-offset_left = 1027.0
-offset_top = 13.0
-offset_right = 1223.0
-offset_bottom = 58.0
-text = "MatheusMDX"
-label_settings = SubResource("LabelSettings_ajl3s")
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="Enemy" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(381, 143)
+scale = Vector2(8.41364, 6.57143)
+texture = ExtResource("6_qqw5o")
+hframes = 5
+vframes = 3
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
