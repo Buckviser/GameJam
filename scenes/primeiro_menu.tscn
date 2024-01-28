@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dlsgrtxiawlry"]
+[gd_scene load_steps=4 format=3 uid="uid://ov6k367nhb0d"]
 
-[ext_resource type="Texture2D" uid="uid://dtimtmmqid647" path="res://sprites/main_capibara.png" id="1_uq1tn"]
+[ext_resource type="Texture2D" uid="uid://b3amjnnlibe7j" path="res://sprites/main_capibara.png" id="1_uq1tn"]
 [ext_resource type="Texture2D" uid="uid://h0bctrfqnqsb" path="res://sprites/fundo.png" id="2_2pnth"]
 
 [sub_resource type="GDScript" id="GDScript_y12k7"]
