@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
-[ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="2_n4edi"]
+[ext_resource type="Texture2D" uid="uid://bfqtrrndfk5fb" path="res://sprites/cartinha_mesa_back.png" id="2_7xvee"]
 [ext_resource type="Texture2D" uid="uid://b1e4xfiddc4jo" path="res://sprites/cenario.png" id="6_6u686"]
 [ext_resource type="Texture2D" uid="uid://x5c24tyujtj7" path="res://sprites/mesa_bar.png" id="6_kp2p7"]
 
@@ -33,7 +33,7 @@ var hand_container_offset := {
 	4: Vector2(387, 0), 5: Vector2(441, 0)}
 	
 var _test_card := {
-	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.TOC_TOC,
+	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.PIADINHAS,
 	\"rarity\": 1, \"cost\": 1, \"base_force\": 1
 }
 
@@ -343,7 +343,7 @@ _enemy_hand_container = NodePath("enemy_hand_container")
 _player_hand_container = NodePath("player_hand_container")
 _player_deck_node = NodePath("player_deck")
 _enemy_deck_node = NodePath("enemy_deck")
-_used_card_final_position = NodePath("Marker2D")
+_used_card_final_position = NodePath("used_enemy_card_position")
 _player_position = NodePath("player_position")
 _enemy_position = NodePath("enemy_position")
 metadata/_edit_lock_ = true
@@ -351,24 +351,20 @@ metadata/_edit_lock_ = true
 [node name="player_deck" type="TextureRect" parent="."]
 z_index = 1
 layout_mode = 0
-offset_left = 869.0
-offset_top = 549.0
-offset_right = 971.0
-offset_bottom = 693.0
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_n4edi")
-expand_mode = 1
+offset_left = 873.0
+offset_top = 567.0
+offset_right = 913.0
+offset_bottom = 617.0
+texture = ExtResource("2_7xvee")
 
 [node name="enemy_deck" type="TextureRect" parent="."]
 z_index = 1
 layout_mode = 0
-offset_left = 487.0
-offset_top = 426.0
-offset_right = 589.0
-offset_bottom = 570.0
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_n4edi")
-expand_mode = 1
+offset_left = 504.0
+offset_top = 442.0
+offset_right = 544.0
+offset_bottom = 492.0
+texture = ExtResource("2_7xvee")
 
 [node name="player_hand_container" type="HBoxContainer" parent="."]
 z_index = 2
@@ -397,9 +393,14 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Marker2D" type="Marker2D" parent="."]
+[node name="used_enemy_card_position" type="Marker2D" parent="."]
 z_index = 1
-position = Vector2(629, 333)
+position = Vector2(611, 516)
+gizmo_extents = 0.0
+
+[node name="used_player_card_position" type="Marker2D" parent="."]
+z_index = 1
+position = Vector2(787, 521)
 gizmo_extents = 0.0
 
 [node name="Cenario" type="TextureRect" parent="."]
@@ -442,6 +443,21 @@ position = Vector2(655, 660)
 
 [node name="enemy_position" type="Marker2D" parent="."]
 position = Vector2(770, 355)
+
+[node name="player_card_start" type="Marker2D" parent="."]
+position = Vector2(837, 513)
+scale = Vector2(0.3, 0.3)
+
+[node name="enemy_card_start" type="Marker2D" parent="."]
+position = Vector2(468, 387)
+scale = Vector2(0.3, 0.3)
+
+[node name="card" parent="." instance=ExtResource("1_sqmq8")]
+offset_left = 837.0
+offset_top = 513.0
+offset_right = 972.0
+offset_bottom = 693.0
+scale = Vector2(0.3, 0.3)
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
 [connection signal="pressed" from="gui/end_turn_button" to="." method="_on_end_turn_button_pressed"]

@@ -1,13 +1,15 @@
-[gd_scene load_steps=11 format=3 uid="uid://d3we480ibjoa8"]
+[gd_scene load_steps=15 format=3 uid="uid://d3we480ibjoa8"]
 
-[ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="1_u8s0t"]
 [ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="3_8edwt"]
 [ext_resource type="Texture2D" uid="uid://chpfrcl0djfps" path="res://sprites/Carta_Raridade_-_Prata.png" id="3_vkk01"]
 [ext_resource type="Texture2D" uid="uid://chlwrw5lsf7u3" path="res://sprites/Carta_Raridade_-_Bronze.png" id="4_1xt0e"]
-[ext_resource type="Texture2D" uid="uid://b0cyfn1734cgu" path="res://sprites/Layout_Cartas.png" id="4_hva5v"]
 [ext_resource type="Texture2D" uid="uid://bx2nxqgynn0bn" path="res://sprites/Carta_-_Piadinha.png" id="4_k38op"]
 [ext_resource type="Texture2D" uid="uid://cmcq60j1ae44a" path="res://sprites/Carta_-_Toc_Toc.png" id="5_vwhxw"]
-[ext_resource type="Texture2D" uid="uid://x5phimer2iwn" path="res://sprites/Carta_-_Trocadilho.png" id="6_t1frb"]
+[ext_resource type="Texture2D" uid="uid://ij1ruk53qx0y" path="res://sprites/Carta_Tipo_-_Nomes.png" id="6_ptu3o"]
+[ext_resource type="Texture2D" uid="uid://dv3ftgx6vlfvb" path="res://sprites/Carta_Tipo_-_Animal.png" id="7_l68r0"]
+[ext_resource type="Texture2D" uid="uid://r7lk2y45ov6n" path="res://sprites/Carta_Tipo_-_Objeto.png" id="8_42c6y"]
+[ext_resource type="Texture2D" uid="uid://r6256khehm8r" path="res://sprites/Carta_Layout.png" id="8_d27jp"]
+[ext_resource type="Texture2D" uid="uid://bfqtrrndfk5fb" path="res://sprites/cartinha_mesa_back.png" id="9_tsw8i"]
 
 [sub_resource type="GDScript" id="GDScript_67sht"]
 script/source = "extends Control
@@ -27,7 +29,9 @@ signal flip_finished
 
 @export var _piadinha_texture: Texture2D
 @export var _toctoc_texture: Texture2D
-@export var _trocadilho_texture: Texture2D
+@export var _nome_texture: Texture2D
+@export var _animal_texture: Texture2D
+@export var _objeto_texture: Texture2D
 
 @export var _card_description_label: Label
 @export var _card_back_node: TextureRect
@@ -68,7 +72,7 @@ func set_card_to(p_dict_info: Dictionary) -> void:
 	_card_rarity = p_dict_info[\"rarity\"]
 	
 	_card_description_label.text = _card_text
-	$info_window/cost.text = str(_card_cost)
+	$layout/cost.text = str(_card_cost)
 	_solve_card_power()
 	
 	match _card_rarity:
@@ -88,8 +92,14 @@ func set_card_to(p_dict_info: Dictionary) -> void:
 		Constants.JokesTypes.PIADINHAS:
 			_card_type_node.texture = _piadinha_texture
 		
-		Constants.JokesTypes.TROCADILHO:
-			_card_type_node.texture = _trocadilho_texture
+		Constants.JokesTypes.NOME:
+			_card_type_node.texture = _nome_texture
+		
+		Constants.JokesTypes.ANIMAL:
+			_card_type_node.texture = _animal_texture
+		
+		Constants.JokesTypes.OBJETO:
+			_card_type_node.texture = _objeto_texture
 
 
 func get_card_data() -> Dictionary:
@@ -183,14 +193,18 @@ func _solve_card_power() -> void:
 [sub_resource type="LabelSettings" id="LabelSettings_bqoeu"]
 font_size = 12
 
+[sub_resource type="SystemFont" id="SystemFont_qmo45"]
+font_names = PackedStringArray("Comic Sans MS")
+
+[sub_resource type="LabelSettings" id="LabelSettings_7i6pg"]
+font = SubResource("SystemFont_qmo45")
+
 [node name="card" type="Control" node_paths=PackedStringArray("_card_description_label", "_card_back_node", "_card_rarity_node", "_card_layout_node", "_card_type_node")]
-custom_minimum_size = Vector2(102, 145)
+custom_minimum_size = Vector2(135, 180)
 layout_mode = 3
 anchors_preset = 0
-offset_left = -51.0
-offset_top = -72.0
-offset_right = 51.0
-offset_bottom = 72.0
+offset_right = 135.0
+offset_bottom = 180.0
 pivot_offset = Vector2(52, 76)
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -200,63 +214,70 @@ _silver_card_texture = ExtResource("3_vkk01")
 _bronze_card_texture = ExtResource("4_1xt0e")
 _piadinha_texture = ExtResource("4_k38op")
 _toctoc_texture = ExtResource("5_vwhxw")
-_trocadilho_texture = ExtResource("6_t1frb")
-_card_description_label = NodePath("info_window/card_description")
+_nome_texture = ExtResource("6_ptu3o")
+_animal_texture = ExtResource("7_l68r0")
+_objeto_texture = ExtResource("8_42c6y")
+_card_description_label = NodePath("layout/card_description")
 _card_back_node = NodePath("back")
 _card_rarity_node = NodePath("rarity")
-_card_layout_node = NodePath("info_window")
+_card_layout_node = NodePath("layout")
 _card_type_node = NodePath("type")
 
 [node name="back" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(102, 144)
+custom_minimum_size = Vector2(135, 180)
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0
 pivot_offset = Vector2(51, 72)
-texture = ExtResource("1_u8s0t")
+texture = ExtResource("9_tsw8i")
 expand_mode = 1
 
 [node name="rarity" type="TextureRect" parent="."]
 visible = false
+custom_minimum_size = Vector2(135, 180)
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0
 texture = ExtResource("3_8edwt")
 expand_mode = 1
 
-[node name="info_window" type="TextureRect" parent="."]
+[node name="layout" type="TextureRect" parent="."]
 visible = false
+custom_minimum_size = Vector2(135, 180)
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0
-texture = ExtResource("4_hva5v")
+texture = ExtResource("8_d27jp")
 expand_mode = 1
 
-[node name="card_description" type="Label" parent="info_window"]
+[node name="card_description" type="Label" parent="layout"]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 83.0
-offset_right = 92.0
-offset_bottom = 135.0
+offset_right = 126.0
+offset_bottom = 172.0
 label_settings = SubResource("LabelSettings_bqoeu")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 clip_text = true
 
-[node name="cost" type="Label" parent="info_window"]
+[node name="cost" type="Label" parent="layout"]
 layout_mode = 0
-offset_left = 43.0
-offset_top = -2.0
-offset_right = 58.0
-offset_bottom = 24.0
+offset_left = 105.0
+offset_top = 5.0
+offset_right = 125.0
+offset_bottom = 35.0
+text = "3"
+label_settings = SubResource("LabelSettings_7i6pg")
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="type" type="TextureRect" parent="."]
 visible = false
+custom_minimum_size = Vector2(135, 180)
 layout_mode = 0
-offset_right = 102.0
-offset_bottom = 145.0
+offset_right = 135.0
+offset_bottom = 180.0
 texture = ExtResource("4_k38op")
 expand_mode = 1
