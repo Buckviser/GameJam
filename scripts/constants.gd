@@ -10,8 +10,10 @@ const JokesTypes := {
 
 const TEST_PLAYER_DATA := {
 	"name": "player", 
-	"resistences": {JokesTypes.TOC_TOC: 10, JokesTypes.TROCADILHO: 10, 
-	JokesTypes.PIADINHAS: 10},
+	"sprite": "res://sprites/Player.png",
+	"max_health": 100,
+	"resistences": {JokesTypes.TOC_TOC: 1, JokesTypes.TROCADILHO: 1, 
+	JokesTypes.PIADINHAS: 1},
 	"draw_amount": 3, 
 	"max_locks": 1, 
 	"deck": []}

@@ -1,11 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=6 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="2_n4edi"]
-[ext_resource type="Texture2D" uid="uid://bb5v17h82eb6u" path="res://sprites/Player.png" id="5_f22fu"]
 [ext_resource type="Texture2D" uid="uid://b1e4xfiddc4jo" path="res://sprites/cenario.png" id="6_6u686"]
 [ext_resource type="Texture2D" uid="uid://x5c24tyujtj7" path="res://sprites/mesa_bar.png" id="6_kp2p7"]
-[ext_resource type="Texture2D" uid="uid://c6kvxsdgcosc3" path="res://sprites/Enemy.png" id="6_qqw5o"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
 script/source = "extends Control
@@ -22,6 +20,8 @@ script/source = "extends Control
 @export var _player_deck_node: TextureRect
 @export var _enemy_deck_node: TextureRect
 @export var _used_card_final_position: Marker2D
+@export var _player_position: Marker2D
+@export var _enemy_position: Marker2D
 
 
 # --- Public Variables ---
@@ -62,13 +62,14 @@ var _action_owner: Character
 func _ready() -> void:
 	add_to_group(\"battle_table\")
 	
-	var player = preload(\"res://scripts/player.tscn\").instantiate()
-	var enemy = preload(\"res://scripts/player.tscn\").instantiate()
+	var player = preload(\"res://scenes/character.tscn\").instantiate()
+	var enemy = preload(\"res://scenes/character.tscn\").instantiate()
 	
 	var player_data = Constants.TEST_PLAYER_DATA.duplicate(true)
 	var enemy_data = Constants.TEST_PLAYER_DATA.duplicate(true)
 	
 	enemy_data[\"name\"] = \"Enemy\"
+	enemy_data[\"sprite\"] = \"res://sprites/Enemy.png\"
 	
 	for i in range(0, 15):
 		player_data[\"deck\"].append(_test_card.duplicate(true))
@@ -96,10 +97,12 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 	add_child(p_player)
 	
 	_player_obj = p_player
+	p_player.set_character_type(\"player\")
+	
 	_enemy_obj = p_enemy
 	
-	p_player.position = $Player.position
-	p_enemy.position = $Enemy.position
+	p_player.position = _player_position.position
+	p_enemy.position = _enemy_position.position
 	_player_deck = p_player.deck.duplicate(true)
 	_enemy_deck = p_enemy.deck.duplicate(true)
 	_player_deck.shuffle()
@@ -328,7 +331,7 @@ func _on_end_turn_button_pressed() -> void:
 	_enemy_turn()
 "
 
-[node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck_node", "_enemy_deck_node", "_used_card_final_position")]
+[node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck_node", "_enemy_deck_node", "_used_card_final_position", "_player_position", "_enemy_position")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 1280.0
@@ -341,6 +344,8 @@ _player_hand_container = NodePath("player_hand_container")
 _player_deck_node = NodePath("player_deck")
 _enemy_deck_node = NodePath("enemy_deck")
 _used_card_final_position = NodePath("Marker2D")
+_player_position = NodePath("player_position")
+_enemy_position = NodePath("enemy_position")
 metadata/_edit_lock_ = true
 
 [node name="player_deck" type="TextureRect" parent="."]
@@ -397,22 +402,6 @@ z_index = 1
 position = Vector2(629, 333)
 gizmo_extents = 0.0
 
-[node name="Player" type="Sprite2D" parent="."]
-z_index = 1
-position = Vector2(600, 656)
-scale = Vector2(5, 5)
-texture = ExtResource("5_f22fu")
-hframes = 5
-vframes = 3
-
-[node name="Enemy" type="Sprite2D" parent="."]
-z_index = -1
-position = Vector2(770, 355)
-scale = Vector2(5, 5)
-texture = ExtResource("6_qqw5o")
-hframes = 5
-vframes = 3
-
 [node name="Cenario" type="TextureRect" parent="."]
 z_index = -2
 layout_mode = 1
@@ -447,6 +436,12 @@ offset_top = 486.0
 offset_right = 1205.0
 offset_bottom = 548.0
 text = "End Turn"
+
+[node name="player_position" type="Marker2D" parent="."]
+position = Vector2(655, 660)
+
+[node name="enemy_position" type="Marker2D" parent="."]
+position = Vector2(770, 355)
 
 [connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
 [connection signal="pressed" from="gui/end_turn_button" to="." method="_on_end_turn_button_pressed"]

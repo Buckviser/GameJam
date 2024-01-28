@@ -1,9 +1,14 @@
-[gd_scene load_steps=7 format=3 uid="uid://d3we480ibjoa8"]
+[gd_scene load_steps=12 format=3 uid="uid://d3we480ibjoa8"]
 
 [ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="1_u8s0t"]
 [ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="3_8edwt"]
+[ext_resource type="Texture2D" uid="uid://chpfrcl0djfps" path="res://sprites/Carta_Raridade_-_Prata.png" id="3_vkk01"]
+[ext_resource type="Texture2D" uid="uid://chlwrw5lsf7u3" path="res://sprites/Carta_Raridade_-_Bronze.png" id="4_1xt0e"]
 [ext_resource type="Texture2D" uid="uid://b0cyfn1734cgu" path="res://sprites/Layout_Cartas.png" id="4_hva5v"]
+[ext_resource type="Texture2D" uid="uid://bx2nxqgynn0bn" path="res://sprites/Carta_-_Piadinha.png" id="4_k38op"]
 [ext_resource type="Texture2D" uid="uid://2xx4gw3rqnlw" path="res://sprites/Tipo_de_Piada_-_Toc_Toc.png" id="5_ju462"]
+[ext_resource type="Texture2D" uid="uid://cmcq60j1ae44a" path="res://sprites/Carta_-_Toc_Toc.png" id="5_vwhxw"]
+[ext_resource type="Texture2D" uid="uid://x5phimer2iwn" path="res://sprites/Carta_-_Trocadilho.png" id="6_t1frb"]
 
 [sub_resource type="GDScript" id="GDScript_67sht"]
 script/source = "extends Control
@@ -17,11 +22,13 @@ signal flip_finished
 
 
 # --- Exported Variables ---
-@export var _back_card_texture: Texture2D
 @export var _gold_card_texture: Texture2D
 @export var _silver_card_texture: Texture2D
 @export var _bronze_card_texture: Texture2D
 
+@export var _piadinha_texture: Texture2D
+@export var _toctoc_texture: Texture2D
+@export var _trocadilho_texture: Texture2D
 
 @export var _card_description_label: Label
 @export var _card_back_node: TextureRect
@@ -33,6 +40,7 @@ signal flip_finished
 # --- Public Variables ---
 var is_on_hand := false
 var card_owner: Character
+var card_power: int
 
 
 # --- Private Variables ---
@@ -61,6 +69,28 @@ func set_card_to(p_dict_info: Dictionary) -> void:
 	_card_rarity = p_dict_info[\"rarity\"]
 	
 	_card_description_label.text = _card_text
+	$info_window/cost.text = str(_card_cost)
+	_solve_card_power()
+	
+	match _card_rarity:
+		1:
+			_card_rarity_node.texture = _bronze_card_texture
+		
+		2:
+			_card_rarity_node.texture = _silver_card_texture
+		
+		3:
+			_card_rarity_node.texture = _gold_card_texture
+	
+	match  _card_type:
+		Constants.JokesTypes.TOC_TOC:
+			_card_type_node.texture = _toctoc_texture
+		
+		Constants.JokesTypes.PIADINHAS:
+			_card_type_node.texture = _piadinha_texture
+		
+		Constants.JokesTypes.TROCADILHO:
+			_card_type_node.texture = _trocadilho_texture
 
 
 func get_card_data() -> Dictionary:
@@ -113,12 +143,40 @@ func flip(p_immediatly := false) -> void:
 	emit_signal(\"flip_finished\")
 
 
-func _invert_card(p_time: float = 0.0) -> void:
-	pass 
-
-
 # --- Private Functions ---
 # - Common Use Functions -
+func _solve_card_power() -> void:
+	if _card_rarity == 1:
+		if _card_cost == 1:
+			card_power = 3
+		
+		elif _card_cost == 2:
+			card_power = 4
+		
+		elif _card_cost == 3:
+			card_power = 6
+	
+	elif _card_rarity == 2:
+		if _card_cost == 1:
+			card_power = 5
+		
+		elif _card_cost == 2:
+			card_power = 7
+		
+		elif _card_cost == 3:
+			card_power = 9
+	
+	elif _card_rarity == 3:
+		if _card_cost == 1:
+			card_power = 8
+		
+		elif _card_cost == 2:
+			card_power = 10
+		
+		elif _card_cost == 3:
+			card_power = 11
+
+
 # - Setget Functions -
 # - Signal Functions -
 "
@@ -138,8 +196,12 @@ pivot_offset = Vector2(52, 76)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = SubResource("GDScript_67sht")
-_back_card_texture = ExtResource("1_u8s0t")
 _gold_card_texture = ExtResource("3_8edwt")
+_silver_card_texture = ExtResource("3_vkk01")
+_bronze_card_texture = ExtResource("4_1xt0e")
+_piadinha_texture = ExtResource("4_k38op")
+_toctoc_texture = ExtResource("5_vwhxw")
+_trocadilho_texture = ExtResource("6_t1frb")
 _card_description_label = NodePath("info_window/card_description")
 _card_back_node = NodePath("back")
 _card_rarity_node = NodePath("rarity")
@@ -182,6 +244,15 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 clip_text = true
+
+[node name="cost" type="Label" parent="info_window"]
+layout_mode = 0
+offset_left = 43.0
+offset_top = -2.0
+offset_right = 58.0
+offset_bottom = 24.0
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="type" type="TextureRect" parent="."]
 visible = false
