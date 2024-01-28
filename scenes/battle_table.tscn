@@ -1,11 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=7 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
-[ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="2_n4edi"]
-[ext_resource type="Texture2D" uid="uid://bb5v17h82eb6u" path="res://sprites/Player.png" id="5_f22fu"]
+[ext_resource type="Texture2D" uid="uid://bfqtrrndfk5fb" path="res://sprites/cartinha_mesa_back.png" id="2_7xvee"]
+[ext_resource type="Texture2D" uid="uid://nl43x31aaxrd" path="res://sprites/Riso_preencher.png" id="5_4ib00"]
 [ext_resource type="Texture2D" uid="uid://b1e4xfiddc4jo" path="res://sprites/cenario.png" id="6_6u686"]
 [ext_resource type="Texture2D" uid="uid://x5c24tyujtj7" path="res://sprites/mesa_bar.png" id="6_kp2p7"]
-[ext_resource type="Texture2D" uid="uid://c6kvxsdgcosc3" path="res://sprites/Enemy.png" id="6_qqw5o"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
 script/source = "extends Control
@@ -17,23 +16,27 @@ script/source = "extends Control
 
 # --- Exported Variables ---
 @export var _card_preload: PackedScene
-@export var _enemy_hand_container: HBoxContainer
-@export var _player_hand_container: HBoxContainer
-@export var _player_deck_node: TextureRect
-@export var _enemy_deck_node: TextureRect
-@export var _used_card_final_position: Marker2D
+@export var _enemy_hand_container: Node2D
+@export var _player_hand_container: Node2D
+@export var _player_deck_node: Sprite2D
+@export var _enemy_deck_node: Sprite2D
+@export var _player_used_card_position: Marker2D
+@export var _enemy_used_card_position: Marker2D
+@export var _player_position: Marker2D
+@export var _enemy_position: Marker2D
+@export var _player_hand_pos_container: Node2D
+@export var _enemy_hand_pos_container: Node2D
 
 
 # --- Public Variables ---
 
 
 # --- Private Variables ---
-var hand_container_offset := {
-	1: Vector2(225, 0), 2: Vector2(279, 0), 3: Vector2(333, 0), 
-	4: Vector2(387, 0), 5: Vector2(441, 0)}
-	
+var _player_hand_positions := {}
+var _enemy_hand_positions := {}
+
 var _test_card := {
-	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.TOC_TOC,
+	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.PIADINHAS,
 	\"rarity\": 1, \"cost\": 1, \"base_force\": 1
 }
 
@@ -62,16 +65,29 @@ var _action_owner: Character
 func _ready() -> void:
 	add_to_group(\"battle_table\")
 	
-	var player = preload(\"res://scripts/player.tscn\").instantiate()
-	var enemy = preload(\"res://scripts/player.tscn\").instantiate()
+	for node in _player_hand_pos_container.get_children():
+		_player_hand_positions[node.name.to_int()] = node.global_position
+	
+	for node in _enemy_hand_pos_container.get_children():
+		_enemy_hand_positions[node.name.to_int()] = node.global_position
+	
+	var player = preload(\"res://scenes/character.tscn\").instantiate()
+	var enemy = preload(\"res://scenes/character.tscn\").instantiate()
 	
 	var player_data = Constants.TEST_PLAYER_DATA.duplicate(true)
 	var enemy_data = Constants.TEST_PLAYER_DATA.duplicate(true)
 	
 	enemy_data[\"name\"] = \"Enemy\"
+	enemy_data[\"sprite\"] = \"res://sprites/Enemy.png\"
+	enemy_data[\"draw_amount\"] = 1
+	
+	player_data[\"draw_amount\"] = 1
+	var card_factory := CardFactory.new()
 	
 	for i in range(0, 15):
-		player_data[\"deck\"].append(_test_card.duplicate(true))
+#		player_data[\"deck\"].append(_test_card.duplicate(true))
+#		enemy_data[\"deck\"].append(_test_card_2.duplicate(true))
+		player_data[\"deck\"].append(card_factory.get_card_info())
 		enemy_data[\"deck\"].append(_test_card_2.duplicate(true))
 	
 	player.load_player_data(player_data)
@@ -82,12 +98,11 @@ func _ready() -> void:
 
 func _input(p_event: InputEvent) -> void:
 	if p_event is InputEventKey and p_event.is_pressed():
-#		if p_event.keycode == KEY_SPACE and _enemy_cards_count < 5:
-#			_draw_new_card(\"enemy\", _test_card_2)
+		if p_event.keycode == KEY_SPACE:
+			_draw_new_card(_player_obj, _test_card.duplicate(true))
 		
-		if p_event.keycode == KEY_Z and _enemy_cards_count > 0:
-			var card = _enemy_hand_container.get_child(0)
-			request_card_use(card)
+		if p_event.keycode == KEY_Z:
+			_draw_new_card(_enemy_obj, _test_card_2.duplicate(true))
 
 
 # --- Public Functions ---
@@ -96,10 +111,12 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 	add_child(p_player)
 	
 	_player_obj = p_player
+	p_player.set_character_type(\"player\")
+	
 	_enemy_obj = p_enemy
 	
-	p_player.position = $Player.position
-	p_enemy.position = $Enemy.position
+	p_player.position = _player_position.position
+	p_enemy.position = _enemy_position.position
 	_player_deck = p_player.deck.duplicate(true)
 	_enemy_deck = p_enemy.deck.duplicate(true)
 	_player_deck.shuffle()
@@ -108,60 +125,76 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 	_new_turn()
 
 
-func request_card_use(p_card: Control) -> void:
+func request_card_use(p_card: Node2D) -> void:
 	if p_card.card_owner != _action_owner:
 		return
 	
+	var final_pos
+	
 	if p_card.card_owner == _player_obj:
+		p_card.reparent(_player_used_card_position)
+		final_pos = _player_used_card_position.global_position
 		_player_cards_count -= 1
 		_disconnect_player_card_signals(p_card)
+		p_card.prepare_to_use()
 	
 	else:
 		_enemy_cards_count -= 1
+		p_card.reparent(_enemy_used_card_position)
+		final_pos = _enemy_used_card_position.global_position
+		p_card.scale = Vector2(0.3, 0.3)
 	
 	p_card.z_index = 3
-	p_card.prepare_to_use()
-	p_card.reparent($used_cards_pile)
-	
-	
-	var tween = create_tween()
-	tween.tween_property(p_card, \"global_position\", 
-			_used_card_final_position.global_position, 0.3)
-	
-	await tween.finished
-	p_card.z_index = 0
+	_organize_hand(p_card.card_owner)
+	await _do_card_tween(p_card, final_pos, Vector2(0.3, 0.3))
+	p_card.z_index = 1
 	
 	if p_card.card_owner == _enemy_obj:
-		p_card.flip()
+		p_card.flip(false, true)
 		_enemy_discard_pile.append(p_card.get_card_data())
+		$gui/player_health.text = str(_player_obj.receive_damage(p_card))
 	
 	else:
 		_player_discard_pile.append(p_card.get_card_data())
+		$gui/enemy_health.text = str(_enemy_obj.receive_damage(p_card))
 
 
 # --- Private Functions ---
 # - Common Use Functions -
 func _draw_new_card(p_who: Character, p_card_info: Dictionary) -> void:
 	var new_card = _card_preload.instantiate()
-	var used_deck
+	var start_position
+	var final_scale
+	var final_pos
 	
 	if p_who == _player_obj:
 		_player_cards_count += 1
-		used_deck = _player_deck_node
+		start_position = _player_deck_node.global_position
 		_connect_player_card_signals(new_card)
+		final_pos = _player_hand_positions[_player_cards_count]
+		final_scale = Vector2(1, 1)
 	
 	else:
 		_enemy_cards_count += 1
-		used_deck = _enemy_deck_node 
+		start_position = _enemy_deck_node.global_position
+		final_pos = _enemy_hand_positions[_enemy_cards_count]
+		final_scale = Vector2(0.3, 0.3)
 	
 	new_card.card_owner = p_who
 	
-	new_card.position = used_deck.position
-	new_card.rotation = used_deck.rotation
+	new_card.global_position = start_position
 	new_card.set_card_to(p_card_info)
 	add_child(new_card)
 	
-	_do_card_tween(new_card)
+	await _do_card_tween(new_card, final_pos, final_scale)
+	
+	if new_card.card_owner == _player_obj:
+		new_card.is_on_hand = true
+		await new_card.flip()
+		new_card.reparent(_player_hand_container)
+	
+	else:
+		new_card.reparent(_enemy_hand_container)
 
 
 func _new_turn() -> void:
@@ -222,6 +255,25 @@ func _reset_deck(p_who: Character) -> void:
 	deck.shuffle()
 
 
+func _organize_hand(p_who: Character) -> void:
+	var hand_container
+	var positions
+	
+	if p_who == _player_obj:
+		hand_container = _player_hand_container
+		positions = _player_hand_positions
+	
+	else:
+		hand_container = _enemy_hand_container
+		positions = _enemy_hand_positions
+	
+	var count = 1
+	
+	for card in hand_container.get_children():
+		card.global_position = positions[count]
+		count += 1
+
+
 func _enemy_turn() -> void:
 	_action_owner = _enemy_obj
 	await get_tree().create_timer(1.0).timeout
@@ -233,62 +285,36 @@ func _enemy_turn() -> void:
 	_new_turn()
 
 
-func _do_card_tween(p_card: Control) -> void:
-	var first_position: Vector2
-	var final_position: Vector2
-	var container: HBoxContainer
+func _do_card_tween(p_card: Node2D, p_final_pos: Vector2, 
+		p_final_scale: Vector2) -> void:
 	
-	if p_card.card_owner == _player_obj:
-		first_position = Vector2(1330, 500)
-		final_position = _player_hand_container.global_position + hand_container_offset[_player_cards_count]
-		container = _player_hand_container
-	
-	else:
-		first_position = Vector2(-298, 34)
-		final_position = _enemy_hand_container.global_position + hand_container_offset[_enemy_cards_count]
-		container = _enemy_hand_container
-	
-	var tween = create_tween()
-	tween.tween_property(p_card, \"position\", first_position, 0.4)
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(p_card, \"global_position\", p_final_pos, 0.4)
+	tween.tween_property(p_card, \"scale\", p_final_scale, 0.4)
 	await tween.finished
+
+
+func _connect_player_card_signals(p_card: Node2D) -> void:
+	var child = p_card.get_child(1)
 	
-	if p_card.card_owner == _player_obj:
-		p_card.flip(true)
+	child.gui_input.connect(_on_player_card_gui_input.bind(p_card))
+	child.mouse_entered.connect(_on_player_card_mouse_entered.bind(p_card))
+	child.mouse_exited.connect(_on_player_card_mouse_exited.bind(p_card))
+
+
+func _disconnect_player_card_signals(p_card: Node2D) -> void:
+	var child = p_card.get_child(1)
 	
-	tween = create_tween()
-	tween.tween_property(p_card, \"position\", final_position, 0.5)
-	p_card.z_index = 0
-	await tween.finished
-	p_card.reparent(container)
-	
-	if p_card.card_owner == _player_obj:
-		p_card.is_on_hand = true
-
-
-func _connect_player_card_signals(p_card: Control) -> void:
-	p_card.gui_input.connect(_on_player_card_gui_input.bind(p_card))
-	p_card.mouse_entered.connect(_on_player_card_mouse_entered.bind(p_card))
-	p_card.mouse_exited.connect(_on_player_card_mouse_exited.bind(p_card))
-
-
-func _disconnect_player_card_signals(p_card: Control) -> void:
-	p_card.gui_input.disconnect(_on_player_card_gui_input)
-	p_card.mouse_entered.disconnect(_on_player_card_mouse_entered)
-	p_card.mouse_exited.disconnect(_on_player_card_mouse_exited)
+	child.gui_input.disconnect(_on_player_card_gui_input)
+	child.mouse_entered.disconnect(_on_player_card_mouse_entered)
+	child.mouse_exited.disconnect(_on_player_card_mouse_exited)
 
 
 # - Setget Functions -
 
 
 # - Signal Functions -
-func _on_deck_gui_input(p_event: InputEvent) -> void:
-	return
-#	if p_event is InputEventMouseButton and p_event.is_pressed():
-#		if p_event.button_index == MOUSE_BUTTON_LEFT and _player_cards_count < 5:
-#			_draw_new_card(\"player\", _test_card)
-
-
-func _on_player_card_gui_input(p_event: InputEvent, p_card: Control) -> void:
+func _on_player_card_gui_input(p_event: InputEvent, p_card: Node2D) -> void:
 	if p_card.is_on_hand == false:
 		return
 	
@@ -297,7 +323,7 @@ func _on_player_card_gui_input(p_event: InputEvent, p_card: Control) -> void:
 			request_card_use(p_card)
 
 
-func _on_player_card_mouse_entered(p_card: Control) -> void:
+func _on_player_card_mouse_entered(p_card: Node2D) -> void:
 	if p_card.is_on_hand == false:
 		return
 	
@@ -314,7 +340,7 @@ func _on_player_card_mouse_entered(p_card: Control) -> void:
 	p_card.z_index = 3
 
 
-func _on_player_card_mouse_exited(p_card: Control) -> void:
+func _on_player_card_mouse_exited(p_card: Node2D) -> void:
 	if p_card.is_on_hand == false:
 		return
 	
@@ -328,7 +354,7 @@ func _on_end_turn_button_pressed() -> void:
 	_enemy_turn()
 "
 
-[node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck_node", "_enemy_deck_node", "_used_card_final_position")]
+[node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck_node", "_enemy_deck_node", "_player_used_card_position", "_enemy_used_card_position", "_player_position", "_enemy_position", "_player_hand_pos_container", "_enemy_hand_pos_container")]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 1280.0
@@ -336,82 +362,18 @@ offset_bottom = 720.0
 mouse_filter = 2
 script = SubResource("GDScript_si2f6")
 _card_preload = ExtResource("1_sqmq8")
-_enemy_hand_container = NodePath("enemy_hand_container")
-_player_hand_container = NodePath("player_hand_container")
-_player_deck_node = NodePath("player_deck")
-_enemy_deck_node = NodePath("enemy_deck")
-_used_card_final_position = NodePath("Marker2D")
+_enemy_hand_container = NodePath("player_hand_container")
+_player_hand_container = NodePath("enemy_hand_container")
+_player_deck_node = NodePath("MesaBar/player_deck")
+_enemy_deck_node = NodePath("MesaBar/enemy_deck")
+_player_used_card_position = NodePath("used_player_card_position")
+_enemy_used_card_position = NodePath("used_enemy_card_position")
+_player_position = NodePath("player_position")
+_enemy_position = NodePath("enemy_position")
+_player_hand_pos_container = NodePath("player_cards_positions")
+_enemy_hand_pos_container = NodePath("enemy_cards_positions")
 metadata/_edit_lock_ = true
-
-[node name="player_deck" type="TextureRect" parent="."]
-z_index = 1
-layout_mode = 0
-offset_left = 869.0
-offset_top = 549.0
-offset_right = 971.0
-offset_bottom = 693.0
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_n4edi")
-expand_mode = 1
-
-[node name="enemy_deck" type="TextureRect" parent="."]
-z_index = 1
-layout_mode = 0
-offset_left = 487.0
-offset_top = 426.0
-offset_right = 589.0
-offset_bottom = 570.0
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_n4edi")
-expand_mode = 1
-
-[node name="player_hand_container" type="HBoxContainer" parent="."]
-z_index = 2
-layout_mode = 0
-offset_left = 668.0
-offset_top = 574.0
-offset_right = 1180.0
-offset_bottom = 707.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-alignment = 1
-
-[node name="enemy_hand_container" type="HBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 302.0
-offset_top = 212.0
-offset_right = 543.0
-offset_bottom = 261.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-alignment = 1
-
-[node name="used_cards_pile" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Marker2D" type="Marker2D" parent="."]
-z_index = 1
-position = Vector2(629, 333)
-gizmo_extents = 0.0
-
-[node name="Player" type="Sprite2D" parent="."]
-z_index = 1
-position = Vector2(600, 656)
-scale = Vector2(5, 5)
-texture = ExtResource("5_f22fu")
-hframes = 5
-vframes = 3
-
-[node name="Enemy" type="Sprite2D" parent="."]
-z_index = -1
-position = Vector2(770, 355)
-scale = Vector2(5, 5)
-texture = ExtResource("6_qqw5o")
-hframes = 5
-vframes = 3
+metadata/_edit_vertical_guides_ = []
 
 [node name="Cenario" type="TextureRect" parent="."]
 z_index = -2
@@ -436,17 +398,128 @@ metadata/_edit_lock_ = true
 position = Vector2(640, 360)
 
 [node name="MesaBar" type="Sprite2D" parent="."]
-position = Vector2(697, 360)
+position = Vector2(498, 365)
 texture = ExtResource("6_kp2p7")
+
+[node name="player_deck" type="Sprite2D" parent="MesaBar"]
+z_index = 1
+position = Vector2(-177, 230)
+texture = ExtResource("2_7xvee")
+
+[node name="enemy_deck" type="Sprite2D" parent="MesaBar"]
+z_index = 1
+position = Vector2(-174, 106)
+texture = ExtResource("2_7xvee")
 
 [node name="gui" type="CanvasLayer" parent="."]
 
 [node name="end_turn_button" type="Button" parent="gui"]
-offset_left = 1051.0
-offset_top = 486.0
-offset_right = 1205.0
-offset_bottom = 548.0
+offset_left = 33.0
+offset_top = 638.0
+offset_right = 187.0
+offset_bottom = 700.0
 text = "End Turn"
 
-[connection signal="gui_input" from="player_deck" to="." method="_on_deck_gui_input"]
+[node name="player_health" type="Label" parent="gui"]
+offset_left = 44.0
+offset_top = 501.0
+offset_right = 210.0
+offset_bottom = 582.0
+text = "Enemy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="enemy_health" type="Label" parent="gui"]
+offset_left = 773.0
+offset_top = 316.0
+offset_right = 939.0
+offset_bottom = 397.0
+text = "Enemy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="player_status" type="Control" parent="gui"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="enemy_status" type="Control" parent="gui"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 402.0
+offset_top = 326.0
+offset_right = 442.0
+offset_bottom = 366.0
+
+[node name="health_bar" type="TextureProgressBar" parent="gui/enemy_status"]
+layout_mode = 0
+offset_right = 297.0
+offset_bottom = 40.0
+value = 50.0
+nine_patch_stretch = true
+texture_progress = ExtResource("5_4ib00")
+
+[node name="used_player_card_position" type="Marker2D" parent="."]
+z_index = 1
+position = Vector2(387, 593)
+gizmo_extents = 0.0
+
+[node name="used_enemy_card_position" type="Marker2D" parent="."]
+z_index = 1
+position = Vector2(384, 470)
+gizmo_extents = 0.0
+
+[node name="player_position" type="Marker2D" parent="."]
+position = Vector2(456, 665)
+
+[node name="enemy_position" type="Marker2D" parent="."]
+position = Vector2(571, 360)
+
+[node name="player_cards_positions" type="Node2D" parent="."]
+position = Vector2(806, 543)
+
+[node name="1" type="Marker2D" parent="player_cards_positions"]
+
+[node name="2" type="Marker2D" parent="player_cards_positions"]
+position = Vector2(100, 0)
+
+[node name="3" type="Marker2D" parent="player_cards_positions"]
+position = Vector2(200, 0)
+
+[node name="4" type="Marker2D" parent="player_cards_positions"]
+position = Vector2(300, 0)
+
+[node name="5" type="Marker2D" parent="player_cards_positions"]
+position = Vector2(400, 0)
+
+[node name="enemy_cards_positions" type="Node2D" parent="."]
+position = Vector2(518, 457)
+
+[node name="1" type="Marker2D" parent="enemy_cards_positions"]
+
+[node name="2" type="Marker2D" parent="enemy_cards_positions"]
+position = Vector2(40, 0)
+
+[node name="3" type="Marker2D" parent="enemy_cards_positions"]
+position = Vector2(80, 0)
+
+[node name="4" type="Marker2D" parent="enemy_cards_positions"]
+position = Vector2(120, 0)
+
+[node name="5" type="Marker2D" parent="enemy_cards_positions"]
+position = Vector2(160, 0)
+
+[node name="player_hand_container" type="Node2D" parent="."]
+
+[node name="enemy_hand_container" type="Node2D" parent="."]
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+layout_mode = 0
+offset_left = 436.0
+offset_top = 353.0
+offset_right = 506.0
+offset_bottom = 393.0
+texture_progress = ExtResource("5_4ib00")
+
 [connection signal="pressed" from="gui/end_turn_button" to="." method="_on_end_turn_button_pressed"]

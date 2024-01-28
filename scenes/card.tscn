@@ -1,12 +1,18 @@
-[gd_scene load_steps=7 format=3 uid="uid://d3we480ibjoa8"]
+[gd_scene load_steps=16 format=3 uid="uid://d3we480ibjoa8"]
 
-[ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="1_u8s0t"]
 [ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="3_8edwt"]
-[ext_resource type="Texture2D" uid="uid://b0cyfn1734cgu" path="res://sprites/Layout_Cartas.png" id="4_hva5v"]
-[ext_resource type="Texture2D" uid="uid://2xx4gw3rqnlw" path="res://sprites/Tipo_de_Piada_-_Toc_Toc.png" id="5_ju462"]
+[ext_resource type="Texture2D" uid="uid://chpfrcl0djfps" path="res://sprites/Carta_Raridade_-_Prata.png" id="3_vkk01"]
+[ext_resource type="Texture2D" uid="uid://chlwrw5lsf7u3" path="res://sprites/Carta_Raridade_-_Bronze.png" id="4_1xt0e"]
+[ext_resource type="Texture2D" uid="uid://bx2nxqgynn0bn" path="res://sprites/Carta_-_Piadinha.png" id="4_k38op"]
+[ext_resource type="Texture2D" uid="uid://cmcq60j1ae44a" path="res://sprites/Carta_-_Toc_Toc.png" id="5_vwhxw"]
+[ext_resource type="Texture2D" uid="uid://ij1ruk53qx0y" path="res://sprites/Carta_Tipo_-_Nomes.png" id="6_ptu3o"]
+[ext_resource type="Texture2D" uid="uid://dv3ftgx6vlfvb" path="res://sprites/Carta_Tipo_-_Animal.png" id="7_l68r0"]
+[ext_resource type="Texture2D" uid="uid://r7lk2y45ov6n" path="res://sprites/Carta_Tipo_-_Objeto.png" id="8_42c6y"]
+[ext_resource type="Texture2D" uid="uid://r6256khehm8r" path="res://sprites/Carta_Layout.png" id="8_d27jp"]
+[ext_resource type="Texture2D" uid="uid://bfqtrrndfk5fb" path="res://sprites/cartinha_mesa_back.png" id="9_tsw8i"]
 
 [sub_resource type="GDScript" id="GDScript_67sht"]
-script/source = "extends Control
+script/source = "extends Node2D
 
 # --- Signals ---
 signal flip_finished
@@ -17,13 +23,18 @@ signal flip_finished
 
 
 # --- Exported Variables ---
-@export var _back_card_texture: Texture2D
 @export var _gold_card_texture: Texture2D
 @export var _silver_card_texture: Texture2D
 @export var _bronze_card_texture: Texture2D
 
+@export var _piadinha_texture: Texture2D
+@export var _toctoc_texture: Texture2D
+@export var _nome_texture: Texture2D
+@export var _animal_texture: Texture2D
+@export var _objeto_texture: Texture2D
 
-@export var _card_description_label: Label
+@export var _card_description_node: Label
+@export var _card_cost_node: Label
 @export var _card_back_node: TextureRect
 @export var _card_rarity_node: TextureRect
 @export var _card_layout_node: TextureRect
@@ -33,12 +44,13 @@ signal flip_finished
 # --- Public Variables ---
 var is_on_hand := false
 var card_owner: Character
+var card_power: int
+var card_type: String
 
 
 # --- Private Variables ---
 var _card_name: String
 var _card_text: String
-var _card_type: String
 var _card_cost := 1
 var _card_rarity := 1
 var _flip_side := 0
@@ -56,35 +68,69 @@ func _ready() -> void:
 func set_card_to(p_dict_info: Dictionary) -> void:
 	_card_name = p_dict_info[\"name\"]
 	_card_text = p_dict_info[\"text\"]
-	_card_type = p_dict_info[\"type\"]
+	card_type = p_dict_info[\"type\"]
 	_card_cost = p_dict_info[\"cost\"]
 	_card_rarity = p_dict_info[\"rarity\"]
 	
-	_card_description_label.text = _card_text
+	_card_description_node.text = _card_text
+	_card_cost_node.text = str(_card_cost)
+	_solve_card_power()
+	
+	match _card_rarity:
+		1:
+			_card_rarity_node.texture = _bronze_card_texture
+		
+		2:
+			_card_rarity_node.texture = _silver_card_texture
+		
+		3:
+			_card_rarity_node.texture = _gold_card_texture
+	
+	match card_type:
+		Constants.JokesTypes.TOC_TOC:
+			_card_type_node.texture = _toctoc_texture
+		
+		Constants.JokesTypes.PIADINHAS:
+			_card_type_node.texture = _piadinha_texture
+		
+		Constants.JokesTypes.NOME:
+			_card_type_node.texture = _nome_texture
+		
+		Constants.JokesTypes.ANIMAL:
+			_card_type_node.texture = _animal_texture
+		
+		Constants.JokesTypes.OBJETO:
+			_card_type_node.texture = _objeto_texture
 
 
 func get_card_data() -> Dictionary:
 	var dict := {}
 	dict[\"name\"] = _card_name
 	dict[\"text\"] = _card_text
-	dict[\"type\"] = _card_type
+	dict[\"type\"] = card_type
 	dict[\"cost\"] = _card_cost
 	dict[\"rarity\"] = _card_rarity
 	
 	return dict
 
 
-func prepare_to_use() -> void:
+func prepare_to_use(p_is_enemy := false) -> void:
 	is_on_hand = false
 	
-	var tween = create_tween()
-	tween.tween_property(self, \"scale\", Vector2(1.0, 1.0), 0.2)
+	if p_is_enemy == false:
+		var tween = create_tween()
+		tween.tween_property(self, \"scale\", Vector2(1.0, 1.0), 0.2)
 
 
-func flip(p_immediatly := false) -> void:
+func flip(p_immediatly := false, p_is_enemy := false) -> void:
 	if p_immediatly == false:
 		var tween = create_tween()
-		tween.tween_property(self, \"scale\", Vector2(0, 1), 0.15)
+		if p_is_enemy:
+			tween.tween_property(self, \"scale\", Vector2(0, 0.3), 0.15)
+		
+		else:
+			tween.tween_property(self, \"scale\", Vector2(0, 1), 0.15)
+		
 		await tween.finished
 	
 	if _flip_side == 0:
@@ -108,85 +154,155 @@ func flip(p_immediatly := false) -> void:
 	
 	if p_immediatly == false:
 		var tween = create_tween()
-		tween.tween_property(self, \"scale\", Vector2(1, 1), 0.15)
+		if p_is_enemy:
+			tween.tween_property(self, \"scale\", Vector2(0.3, 0.3), 0.15)
+		
+		else:
+			tween.tween_property(self, \"scale\", Vector2(1, 1), 0.15)
 	
 	emit_signal(\"flip_finished\")
 
 
-func _invert_card(p_time: float = 0.0) -> void:
-	pass 
+func make_text_grab_focus() -> void:
+	_card_description_node.grab_focus()
 
 
 # --- Private Functions ---
 # - Common Use Functions -
+func _solve_card_power() -> void:
+	if _card_rarity == 1:
+		if _card_cost == 1:
+			card_power = 3
+		
+		elif _card_cost == 2:
+			card_power = 4
+		
+		elif _card_cost == 3:
+			card_power = 6
+	
+	elif _card_rarity == 2:
+		if _card_cost == 1:
+			card_power = 5
+		
+		elif _card_cost == 2:
+			card_power = 7
+		
+		elif _card_cost == 3:
+			card_power = 9
+	
+	elif _card_rarity == 3:
+		if _card_cost == 1:
+			card_power = 8
+		
+		elif _card_cost == 2:
+			card_power = 10
+		
+		elif _card_cost == 3:
+			card_power = 11
+
+
 # - Setget Functions -
 # - Signal Functions -
 "
 
-[sub_resource type="LabelSettings" id="LabelSettings_bqoeu"]
-font_size = 12
+[sub_resource type="SystemFont" id="SystemFont_rb1nl"]
+font_names = PackedStringArray("Arial")
 
-[node name="card" type="Control" node_paths=PackedStringArray("_card_description_label", "_card_back_node", "_card_rarity_node", "_card_layout_node", "_card_type_node")]
-custom_minimum_size = Vector2(102, 145)
-layout_mode = 3
-anchors_preset = 0
-offset_left = -51.0
-offset_top = -72.0
-offset_right = 51.0
-offset_bottom = 72.0
-pivot_offset = Vector2(52, 76)
-size_flags_horizontal = 4
-size_flags_vertical = 4
+[sub_resource type="LabelSettings" id="LabelSettings_u1bo6"]
+font_size = 9
+
+[sub_resource type="SystemFont" id="SystemFont_qmo45"]
+font_names = PackedStringArray("Comic Sans MS")
+
+[sub_resource type="LabelSettings" id="LabelSettings_7i6pg"]
+font = SubResource("SystemFont_qmo45")
+
+[node name="card" type="Node2D" node_paths=PackedStringArray("_card_description_node", "_card_cost_node", "_card_back_node", "_card_rarity_node", "_card_layout_node", "_card_type_node")]
+scale = Vector2(0.3, 0.3)
 script = SubResource("GDScript_67sht")
-_back_card_texture = ExtResource("1_u8s0t")
 _gold_card_texture = ExtResource("3_8edwt")
-_card_description_label = NodePath("info_window/card_description")
+_silver_card_texture = ExtResource("3_vkk01")
+_bronze_card_texture = ExtResource("4_1xt0e")
+_piadinha_texture = ExtResource("4_k38op")
+_toctoc_texture = ExtResource("5_vwhxw")
+_nome_texture = ExtResource("6_ptu3o")
+_animal_texture = ExtResource("7_l68r0")
+_objeto_texture = ExtResource("8_42c6y")
+_card_description_node = NodePath("layout/card_description")
+_card_cost_node = NodePath("layout/cost")
 _card_back_node = NodePath("back")
 _card_rarity_node = NodePath("rarity")
-_card_layout_node = NodePath("info_window")
+_card_layout_node = NodePath("layout")
 _card_type_node = NodePath("type")
 
 [node name="back" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(102, 144)
-layout_mode = 0
-offset_right = 102.0
-offset_bottom = 145.0
+custom_minimum_size = Vector2(135, 180)
+offset_left = -66.6667
+offset_top = -90.0
+offset_right = 68.3333
+offset_bottom = 90.0
 pivot_offset = Vector2(51, 72)
-texture = ExtResource("1_u8s0t")
+mouse_filter = 2
+texture = ExtResource("9_tsw8i")
 expand_mode = 1
 
 [node name="rarity" type="TextureRect" parent="."]
 visible = false
-layout_mode = 0
-offset_right = 102.0
-offset_bottom = 145.0
+custom_minimum_size = Vector2(135, 180)
+offset_left = -66.6667
+offset_top = -90.0
+offset_right = 68.3333
+offset_bottom = 90.0
+mouse_filter = 0
 texture = ExtResource("3_8edwt")
 expand_mode = 1
 
-[node name="info_window" type="TextureRect" parent="."]
+[node name="layout" type="TextureRect" parent="."]
 visible = false
-layout_mode = 0
-offset_right = 102.0
-offset_bottom = 145.0
-texture = ExtResource("4_hva5v")
+custom_minimum_size = Vector2(135, 180)
+offset_left = -66.6667
+offset_top = -90.0
+offset_right = 68.3333
+offset_bottom = 90.0
+mouse_filter = 2
+texture = ExtResource("8_d27jp")
 expand_mode = 1
 
-[node name="card_description" type="Label" parent="info_window"]
+[node name="card_description" type="Label" parent="layout"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 83.0
-offset_right = 92.0
-offset_bottom = 135.0
-label_settings = SubResource("LabelSettings_bqoeu")
-horizontal_alignment = 1
-vertical_alignment = 1
+offset_left = 17.0
+offset_top = 87.0
+offset_right = 117.0
+offset_bottom = 163.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 0
+theme_override_fonts/font = SubResource("SystemFont_rb1nl")
+theme_override_font_sizes/font_size = 7
+text = "– Joãozinho, por que você não fez a lição de casa dessa vez?
+– Porque eu moro em apartamento."
+label_settings = SubResource("LabelSettings_u1bo6")
 autowrap_mode = 3
 clip_text = true
 
+[node name="cost" type="Label" parent="layout"]
+layout_mode = 0
+offset_left = 105.0
+offset_top = 5.0
+offset_right = 125.0
+offset_bottom = 35.0
+text = "3"
+label_settings = SubResource("LabelSettings_7i6pg")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="type" type="TextureRect" parent="."]
 visible = false
-layout_mode = 0
-offset_right = 102.0
-offset_bottom = 145.0
-texture = ExtResource("5_ju462")
+custom_minimum_size = Vector2(135, 180)
+offset_left = -66.6667
+offset_top = -90.0
+offset_right = 68.3333
+offset_bottom = 90.0
+mouse_filter = 2
+texture = ExtResource("4_k38op")
 expand_mode = 1
