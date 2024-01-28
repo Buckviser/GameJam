@@ -1,4 +1,5 @@
 [gd_scene load_steps=8 format=3 uid="uid://ov6k367nhb0d"]
+
 [ext_resource type="Texture2D" uid="uid://b3amjnnlibe7j" path="res://sprites/main_capibara.png" id="1_uq1tn"]
 [ext_resource type="Texture2D" uid="uid://h0bctrfqnqsb" path="res://sprites/fundo.png" id="2_2pnth"]
 
@@ -18,6 +19,21 @@ func _on_button_pressed():
 [sub_resource type="LabelSettings" id="LabelSettings_yydxs"]
 font_size = 75
 
+[sub_resource type="Animation" id="Animation_b3u65"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Label:label_settings:font_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
 [sub_resource type="Animation" id="Animation_ljlv0"]
 resource_name = "animacao_start"
 loop_mode = 1
@@ -32,21 +48,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_b3u65"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Label:label_settings:font_color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ceas7"]
