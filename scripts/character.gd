@@ -58,6 +58,11 @@ func set_character_type(p_type: String) -> void:
 		$Sprite2D.z_index = -1
 
 
+func receive_damage(p_card: Node2D) -> int:
+	current_health -= max(0, p_card.card_power - resistences[p_card.card_type])
+	return current_health
+
+
 # --- Private Functions ---
 # - Common Use Functions -
 # - Setget Functions -
