@@ -6,12 +6,15 @@ class_name Constants
 
 # --- Constants ---
 const JokesTypes := {
-	"TOC_TOC": "toc_toc", "TROCADILHO": "trocadilho", "PIADINHAS": "piadinhas"}
+	"TOC_TOC": "toc_toc", "PIADINHAS": "piadinhas", "NOME": "nome", 
+	"ANIMAL": "animal", "OBJETO": "objeto"}
 
 const TEST_PLAYER_DATA := {
 	"name": "player", 
-	"resistences": {JokesTypes.TOC_TOC: 10, JokesTypes.TROCADILHO: 10, 
-	JokesTypes.PIADINHAS: 10},
+	"sprite": "res://sprites/Player.png",
+	"max_health": 100,
+	"resistences": {JokesTypes.TOC_TOC: 1, JokesTypes.PIADINHAS: 1, 
+	JokesTypes.NOME: 1, JokesTypes.ANIMAL: 1, JokesTypes.OBJETO: 1},
 	"draw_amount": 3, 
 	"max_locks": 1, 
 	"deck": []}
