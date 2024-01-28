@@ -1,0 +1,46 @@
+[gd_scene load_steps=4 format=3 uid="uid://0n21ngy7hah2"]
+
+[ext_resource type="Texture2D" uid="uid://b3amjnnlibe7j" path="res://sprites/main_capibara.png" id="1_uq1tn"]
+[ext_resource type="Texture2D" uid="uid://h0bctrfqnqsb" path="res://sprites/fundo.png" id="2_2pnth"]
+
+[sub_resource type="GDScript" id="GDScript_y12k7"]
+script/source = "extends Control
+
+func _on_button_pressed():
+	var speed = 100
+	
+	func _process(delta):
+		position.x += speed * delta
+		pass
+	
+	get_tree().change_scene_to_file(\"res://scenes/menu.tscn\")
+"
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_y12k7")
+
+[node name="MainCapibara" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(428, 738)
+scale = Vector2(0.551146, 0.628021)
+texture = ExtResource("1_uq1tn")
+
+[node name="Fundo" type="Sprite2D" parent="."]
+position = Vector2(640, 360)
+texture = ExtResource("2_2pnth")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = -18.0
+offset_top = -13.0
+offset_right = 1296.0
+offset_bottom = 733.0
+flat = true
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
