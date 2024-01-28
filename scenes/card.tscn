@@ -113,17 +113,23 @@ func get_card_data() -> Dictionary:
 	return dict
 
 
-func prepare_to_use() -> void:
+func prepare_to_use(p_is_enemy := false) -> void:
 	is_on_hand = false
 	
-	var tween = create_tween()
-	tween.tween_property(self, \"scale\", Vector2(1.0, 1.0), 0.2)
+	if p_is_enemy == false:
+		var tween = create_tween()
+		tween.tween_property(self, \"scale\", Vector2(1.0, 1.0), 0.2)
 
 
-func flip(p_immediatly := false) -> void:
+func flip(p_immediatly := false, p_is_enemy := false) -> void:
 	if p_immediatly == false:
 		var tween = create_tween()
-		tween.tween_property(self, \"scale\", Vector2(0, 1), 0.15)
+		if p_is_enemy:
+			tween.tween_property(self, \"scale\", Vector2(0, 0.3), 0.15)
+		
+		else:
+			tween.tween_property(self, \"scale\", Vector2(0, 1), 0.15)
+		
 		await tween.finished
 	
 	if _flip_side == 0:
@@ -147,7 +153,11 @@ func flip(p_immediatly := false) -> void:
 	
 	if p_immediatly == false:
 		var tween = create_tween()
-		tween.tween_property(self, \"scale\", Vector2(1, 1), 0.15)
+		if p_is_enemy:
+			tween.tween_property(self, \"scale\", Vector2(0.3, 0.3), 0.15)
+		
+		else:
+			tween.tween_property(self, \"scale\", Vector2(1, 1), 0.15)
 	
 	emit_signal(\"flip_finished\")
 
@@ -205,6 +215,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 135.0
 offset_bottom = 180.0
+scale = Vector2(0.3, 0.3)
 pivot_offset = Vector2(52, 76)
 size_flags_horizontal = 4
 size_flags_vertical = 4
