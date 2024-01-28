@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=14 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://bfqtrrndfk5fb" path="res://sprites/cartinha_mesa_back.png" id="2_7xvee"]
@@ -85,14 +85,9 @@ func _ready() -> void:
 	
 	enemy_data[\"name\"] = \"Enemy\"
 	enemy_data[\"sprite\"] = \"res://sprites/Enemy.png\"
-	enemy_data[\"draw_amount\"] = 1
-	
-	player_data[\"draw_amount\"] = 1
 	var card_factory := CardFactory.new()
 	
 	for i in range(0, 15):
-#		player_data[\"deck\"].append(_test_card.duplicate(true))
-#		enemy_data[\"deck\"].append(_test_card_2.duplicate(true))
 		player_data[\"deck\"].append(card_factory.get_card_info())
 		enemy_data[\"deck\"].append(_test_card_2.duplicate(true))
 	
@@ -118,8 +113,10 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 	
 	_player_obj = p_player
 	p_player.set_character_type(\"player\")
-	
 	_enemy_obj = p_enemy
+	
+	$gui.link_character_to_gui(p_player, true)
+	$gui.link_character_to_gui(p_enemy, false)
 	
 	p_player.position = _player_position.position
 	p_enemy.position = _enemy_position.position
@@ -135,7 +132,7 @@ func request_card_use(p_card: Node2D) -> void:
 	if p_card.card_owner != _action_owner:
 		return
 	
-	if p_card.card_owner.can_use_card(p_card) == false:
+	if p_card.card_owner.request_card_activation(p_card) == false:
 		return
 	
 	var final_pos
@@ -161,11 +158,15 @@ func request_card_use(p_card: Node2D) -> void:
 	if p_card.card_owner == _enemy_obj:
 		p_card.flip(false, true)
 		_enemy_discard_pile.append(p_card.get_card_data())
-		$gui/player_health.text = str(_player_obj.receive_damage(p_card))
+		if _player_obj.receive_damage(p_card):
+			_end_match(_enemy_obj)
+			return
 	
 	else:
 		_player_discard_pile.append(p_card.get_card_data())
-		$gui/enemy_health.text = str(_enemy_obj.receive_damage(p_card))
+		if _enemy_obj.receive_damage(p_card):
+			_end_match(_player_obj)
+			return
 
 
 # --- Private Functions ---
@@ -209,6 +210,8 @@ func _draw_new_card(p_who: Character, p_card_info: Dictionary) -> void:
 func _new_turn() -> void:
 	await _discard_characters_cards()
 	_draw_characters_cards()
+	_enemy_obj.new_turn()
+	_player_obj.new_turn()
 	_action_owner = _player_obj
 
 
@@ -303,6 +306,14 @@ func _do_card_tween(p_card: Node2D, p_final_pos: Vector2,
 	await tween.finished
 
 
+func _end_match(p_winner: Character) -> void:
+	if p_winner == _player_obj:
+		print(\"player win\")
+	
+	else:
+		print(\"player lose\")
+
+
 func _connect_player_card_signals(p_card: Node2D) -> void:
 	var child = p_card.get_child(1)
 	
@@ -363,6 +374,81 @@ func _on_end_turn_button_pressed() -> void:
 	_enemy_turn()
 "
 
+[sub_resource type="GDScript" id="GDScript_faqgp"]
+script/source = "extends CanvasLayer
+
+# --- Signals ---
+# --- Enums ---
+# --- Constants ---
+
+
+# --- Exported Variables ---
+@export var _player_laugh_bar: TextureProgressBar
+@export var _player_action_points: Sprite2D
+@export var _enemy_laugh_bar: TextureProgressBar
+@export var _enemy_action_points: Sprite2D
+
+
+# --- Public Variables ---
+# --- Private Variables ---
+# --- Onready Variables ---
+
+
+# --- Engine Callbacks ---
+func _ready() -> void:
+	pass
+
+
+# --- Public Functions ---
+func link_character_to_gui(p_character: Character, p_is_player: bool) -> void:
+	if p_is_player:
+		_player_laugh_bar.max_value = p_character.laugh_limit
+	
+	else:
+		_enemy_laugh_bar.max_value = p_character.laugh_limit
+	
+	p_character.action_points_changed.connect(_on_action_points_changed.bind(p_is_player))
+	p_character.laugh_gauge_changed.connect(_on_laugh_gauge_changed.bind(p_is_player))
+
+
+func unlink_character_to_gui(p_character: Character) -> void:
+	p_character.action_points_changed.disconnect(_on_action_points_changed)
+	p_character.laugh_gauge_changed.disconnect(_on_laugh_gauge_changed)
+
+
+# --- Private Functions ---
+# - Common Use Functions -
+# - Setget Functions -
+
+
+# - Signal Functions -
+func _on_action_points_changed(p_current_value: int, p_is_player: bool) -> void:
+	var container
+	
+	if p_is_player:
+		container = _player_action_points
+	
+	else:
+		container = _enemy_action_points
+	
+	for node in container.get_children():
+		if p_current_value >= node.name.to_int():
+			node.visible = true
+		
+		else:
+			node.visible = false
+
+
+func _on_laugh_gauge_changed(p_current_value: int, p_is_player: bool) -> void:
+	print(p_current_value)
+	if p_is_player:
+		_player_laugh_bar.value = p_current_value
+	
+	else:
+		_enemy_laugh_bar.value = p_current_value
+
+"
+
 [node name="battle_table" type="Control" node_paths=PackedStringArray("_enemy_hand_container", "_player_hand_container", "_player_deck_node", "_enemy_deck_node", "_player_used_card_position", "_enemy_used_card_position", "_player_position", "_enemy_position", "_player_hand_pos_container", "_enemy_hand_pos_container")]
 layout_mode = 3
 anchors_preset = 0
@@ -420,7 +506,12 @@ z_index = 1
 position = Vector2(-174, 106)
 texture = ExtResource("2_7xvee")
 
-[node name="gui" type="CanvasLayer" parent="."]
+[node name="gui" type="CanvasLayer" parent="." node_paths=PackedStringArray("_player_laugh_bar", "_player_action_points", "_enemy_laugh_bar", "_enemy_action_points")]
+script = SubResource("GDScript_faqgp")
+_player_laugh_bar = NodePath("player_status/laugh_bar/progress")
+_player_action_points = NodePath("player_status/action_points")
+_enemy_laugh_bar = NodePath("enemy_status/laugh_bar/progress")
+_enemy_action_points = NodePath("enemy_status/action_points")
 
 [node name="end_turn_button" type="Button" parent="gui"]
 offset_left = 33.0
@@ -495,7 +586,6 @@ layout_mode = 0
 offset_left = 30.0
 offset_right = 205.0
 offset_bottom = 40.0
-value = 100.0
 nine_patch_stretch = true
 texture_progress = ExtResource("5_4ib00")
 
@@ -595,7 +685,6 @@ layout_mode = 0
 offset_left = 30.0
 offset_right = 205.0
 offset_bottom = 40.0
-value = 100.0
 nine_patch_stretch = true
 texture_progress = ExtResource("5_4ib00")
 

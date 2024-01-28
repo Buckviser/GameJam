@@ -13,6 +13,7 @@ signal action_points_changed(action_points)
 
 
 # --- Public Variables ---
+var is_player_character := false
 var player_name: String = "Matheus"
 var current_laugh := 0
 var current_action_points := 3
@@ -43,11 +44,11 @@ func new_turn() -> void:
 	emit_signal("action_points_changed", current_action_points)
 
 
-func request_action_points_use(p_amount: int) -> bool:
-	if p_amount > current_action_points:
+func request_card_activation(p_card: Node2D) -> bool:
+	if p_card.card_cost > current_action_points:
 		return false
 	
-	current_action_points -= p_amount
+	current_action_points -= p_card.card_cost
 	emit_signal("action_points_changed", current_action_points)
 	return true
 
@@ -72,15 +73,16 @@ func play_animation(p_anim_name: String) -> void:
 func set_character_type(p_type: String) -> void:
 	if p_type == "player":
 		$Sprite2D.z_index = 1
+		is_player_character = true
 	
 	else:
 		$Sprite2D.z_index = -1
 
 
-func receive_damage(p_card: Node2D) -> int:
-	current_laugh += min(-5, p_card.card_power - resistences[p_card.card_type])
+func receive_damage(p_card: Node2D) -> bool:
+	current_laugh += max(-5, p_card.card_power - resistences[p_card.card_type])
 	emit_signal("laugh_gauge_changed", current_laugh)
-	return current_laugh
+	return current_laugh >= laugh_limit
 
 
 # --- Private Functions ---
