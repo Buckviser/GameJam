@@ -1,8 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://clcfljux0nmw2"]
+[gd_scene load_steps=23 format=3 uid="uid://clcfljux0nmw2"]
 
 [ext_resource type="Texture2D" uid="uid://b1ysxuqibqmir" path="res://sprites/botao_ativo.png" id="1_ksvt0"]
 [ext_resource type="Texture2D" uid="uid://dh0jb7f5x7n8u" path="res://sprites/menu.png" id="1_x4sqo"]
 [ext_resource type="Texture2D" uid="uid://b3amjnnlibe7j" path="res://sprites/main_capibara.png" id="3_wsm7r"]
+[ext_resource type="Texture2D" uid="uid://cdvsmpvahm4km" path="res://sprites/menu_confirmar_saida.png" id="4_s6i60"]
+[ext_resource type="Texture2D" uid="uid://cy2atoo0dtue2" path="res://sprites/Capi_Confirma.png" id="5_h84ra"]
+
 
 [sub_resource type="GDScript" id="GDScript_id8vg"]
 resource_name = "menu"
@@ -46,6 +49,7 @@ func _on_options_button_mouse_exited():
 func _on_options_button_pressed():
 	get_tree().change_scene_to_file(\"res://scenes/battle_table.tscn\")
 	
+	
 # close game button functions
 func _on_close_game_button_mouse_entered():
 	$close_game_button/AnimationPlayer.play(\"hover\")
@@ -54,7 +58,40 @@ func _on_close_game_button_mouse_exited():
 	$close_game_button/AnimationPlayer.play(\"normal\")
 
 func _on_close_game_button_pressed():
-	get_tree().change_scene_to_file(\"res://scenes/battle_table.tscn\")
+	$MenuConfirmarSaida.visible = true
+
+func _on_sair_sim_mouse_entered():
+	$MenuConfirmarSaida/sair_sim/AnimationPlayer.play(\"hover\")
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_normal.stop()
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_feliz.stop()	
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_triste.play(\"capivara_triste\")	
+	
+func _on_sair_sim_mouse_exited():
+	$MenuConfirmarSaida/sair_sim/AnimationPlayer.play(\"normal\")
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_triste.stop()	
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_feliz.stop()
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_normal.play(\"capivara_normal\")
+	
+func _on_sair_sim_pressed():
+	get_tree().quit()
+
+func _on_sair_nao_mouse_entered():
+	$MenuConfirmarSaida/sair_nao/AnimationPlayer.play(\"hover\")
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_normal.stop()
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_triste.stop()	
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_feliz.play(\"capivara_feliz\")
+
+func _on_sair_nao_mouse_exited():
+	$MenuConfirmarSaida/sair_nao/AnimationPlayer.play(\"normal\")
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_triste.stop()	
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_feliz.stop()
+	$MenuConfirmarSaida/capivara_menu_sair/capivara_normal.play(\"capivara_normal\")
+
+func _on_sair_nao_pressed():
+	$MenuConfirmarSaida.visible = false
+
+
+
 "
 
 [sub_resource type="Animation" id="Animation_aate4"]
@@ -111,6 +148,132 @@ _data = {
 "normal": SubResource("Animation_cd4pg")
 }
 
+[sub_resource type="LabelSettings" id="LabelSettings_0jh8s"]
+font_size = 13
+
+[sub_resource type="LabelSettings" id="LabelSettings_dudai"]
+font_size = 14
+
+[sub_resource type="LabelSettings" id="LabelSettings_1n211"]
+font_size = 50
+
+[sub_resource type="Animation" id="Animation_4weis"]
+resource_name = "capivara_feliz"
+length = 1.5
+loop_mode = 1
+step = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.8, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [10, 11, 12, 13]
+}
+
+[sub_resource type="Animation" id="Animation_04bbp"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [10]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_nyabt"]
+_data = {
+"RESET": SubResource("Animation_04bbp"),
+"capivara_feliz": SubResource("Animation_4weis")
+}
+
+[sub_resource type="Animation" id="Animation_c2ygk"]
+resource_name = "capivara_triste"
+length = 1.5
+loop_mode = 1
+step = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.8, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [5, 6, 7, 8]
+}
+
+[sub_resource type="Animation" id="Animation_u2mwt"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [5]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bjof2"]
+_data = {
+"RESET": SubResource("Animation_u2mwt"),
+"capivara_triste": SubResource("Animation_c2ygk")
+}
+
+[sub_resource type="Animation" id="Animation_j32tg"]
+resource_name = "capivara_normal"
+length = 1.5
+loop_mode = 1
+step = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.6, 0.9, 1.2, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+
+[sub_resource type="Animation" id="Animation_lbtwn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_24v76"]
+_data = {
+"RESET": SubResource("Animation_lbtwn"),
+"capivara_normal": SubResource("Animation_j32tg")
+}
+
 [node name="Menu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -129,10 +292,10 @@ metadata/_edit_lock_ = true
 
 [node name="start_button" type="Button" parent="."]
 layout_mode = 0
-offset_left = 74.0001
-offset_top = 94.0
-offset_right = 148.0
-offset_bottom = 118.0
+offset_left = 100.0
+offset_top = 159.0
+offset_right = 174.0
+offset_bottom = 183.0
 scale = Vector2(5, 5)
 focus_mode = 0
 
@@ -168,10 +331,10 @@ libraries = {
 
 [node name="options_button" type="Button" parent="."]
 layout_mode = 0
-offset_left = 78.0
-offset_top = 287.0
-offset_right = 152.0
-offset_bottom = 311.0
+offset_left = 100.0
+offset_top = 318.0
+offset_right = 174.0
+offset_bottom = 342.0
 scale = Vector2(5, 5)
 focus_mode = 0
 
@@ -183,13 +346,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
+offset_left = -28.0
 offset_top = -13.0
-offset_right = 20.0
+offset_right = 30.0
 offset_bottom = 13.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "Start"
+text = "Opções"
+label_settings = SubResource("LabelSettings_0jh8s")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -207,10 +371,10 @@ libraries = {
 
 [node name="close_game_button" type="Button" parent="."]
 layout_mode = 0
-offset_left = 78.0001
-offset_top = 500.0
-offset_right = 152.0
-offset_bottom = 524.0
+offset_left = 100.0
+offset_top = 477.0
+offset_right = 174.0
+offset_bottom = 501.0
 scale = Vector2(5, 5)
 focus_mode = 0
 
@@ -228,7 +392,8 @@ offset_right = 20.0
 offset_bottom = 13.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "Start"
+text = "Fechar"
+label_settings = SubResource("LabelSettings_dudai")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -250,6 +415,121 @@ position = Vector2(750, 738)
 scale = Vector2(0.565, 0.628)
 texture = ExtResource("3_wsm7r")
 
+[node name="MenuConfirmarSaida" type="Sprite2D" parent="."]
+visible = false
+z_index = 2
+position = Vector2(663, 361)
+texture = ExtResource("4_s6i60")
+
+[node name="sair_sim" type="Button" parent="MenuConfirmarSaida"]
+offset_left = -372.0
+offset_top = 85.0
+offset_right = -298.0
+offset_bottom = 109.0
+scale = Vector2(5, 5)
+focus_mode = 0
+
+[node name="Label" type="Label" parent="MenuConfirmarSaida/sair_sim"]
+z_index = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -13.0
+offset_right = 20.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Sim"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="MenuConfirmarSaida/sair_sim"]
+z_index = 1
+position = Vector2(37, 12)
+texture = ExtResource("1_ksvt0")
+hframes = 13
+vframes = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MenuConfirmarSaida/sair_sim"]
+libraries = {
+"": SubResource("AnimationLibrary_jddta")
+}
+
+[node name="sair_nao" type="Button" parent="MenuConfirmarSaida"]
+offset_left = 7.0
+offset_top = 85.0
+offset_right = 80.9999
+offset_bottom = 109.0
+scale = Vector2(5, 5)
+focus_mode = 0
+
+[node name="Label" type="Label" parent="MenuConfirmarSaida/sair_nao"]
+z_index = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -13.0
+offset_right = 20.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Não"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="MenuConfirmarSaida/sair_nao"]
+z_index = 1
+position = Vector2(37, 12)
+texture = ExtResource("1_ksvt0")
+hframes = 13
+vframes = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MenuConfirmarSaida/sair_nao"]
+libraries = {
+"": SubResource("AnimationLibrary_jddta")
+}
+
+[node name="Label" type="Label" parent="MenuConfirmarSaida"]
+offset_left = -290.0
+offset_top = -150.0
+offset_right = 275.0
+offset_bottom = -78.0
+text = "Deseja realmente sair ?"
+label_settings = SubResource("LabelSettings_1n211")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="capivara_menu_sair" type="Sprite2D" parent="MenuConfirmarSaida"]
+position = Vector2(0, -298)
+scale = Vector2(3, 3)
+texture = ExtResource("5_h84ra")
+hframes = 5
+vframes = 3
+
+[node name="capivara_feliz" type="AnimationPlayer" parent="MenuConfirmarSaida/capivara_menu_sair"]
+libraries = {
+"": SubResource("AnimationLibrary_nyabt")
+}
+
+[node name="capivara_triste" type="AnimationPlayer" parent="MenuConfirmarSaida/capivara_menu_sair"]
+libraries = {
+"": SubResource("AnimationLibrary_bjof2")
+}
+
+[node name="capivara_normal" type="AnimationPlayer" parent="MenuConfirmarSaida/capivara_menu_sair"]
+autoplay = "capivara_normal"
+libraries = {
+"": SubResource("AnimationLibrary_24v76")
+}
+
 [connection signal="mouse_entered" from="start_button" to="." method="_on_button_mouse_entered"]
 [connection signal="mouse_exited" from="start_button" to="." method="_on_button_mouse_exited"]
 [connection signal="pressed" from="start_button" to="." method="_on_button_pressed"]
@@ -259,3 +539,9 @@ texture = ExtResource("3_wsm7r")
 [connection signal="mouse_entered" from="close_game_button" to="." method="_on_close_game_button_mouse_entered"]
 [connection signal="mouse_exited" from="close_game_button" to="." method="_on_close_game_button_mouse_exited"]
 [connection signal="pressed" from="close_game_button" to="." method="_on_close_game_button_pressed"]
+[connection signal="mouse_entered" from="MenuConfirmarSaida/sair_sim" to="." method="_on_sair_sim_mouse_entered"]
+[connection signal="mouse_exited" from="MenuConfirmarSaida/sair_sim" to="." method="_on_sair_sim_mouse_exited"]
+[connection signal="pressed" from="MenuConfirmarSaida/sair_sim" to="." method="_on_sair_sim_pressed"]
+[connection signal="mouse_entered" from="MenuConfirmarSaida/sair_nao" to="." method="_on_sair_nao_mouse_entered"]
+[connection signal="mouse_exited" from="MenuConfirmarSaida/sair_nao" to="." method="_on_sair_nao_mouse_exited"]
+[connection signal="pressed" from="MenuConfirmarSaida/sair_nao" to="." method="_on_sair_nao_pressed"]
