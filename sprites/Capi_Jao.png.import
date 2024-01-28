@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1he3ahuq136b"
-path="res://.godot/imported/upgrades.png-883a99ceb055d2eb710bb58a6eed8718.ctex"
+uid="uid://bs2271qsuea6h"
+path="res://.godot/imported/Capi_Jao.png-3134b0328b11c4d9c7ac35e119eb407a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/upgrades.png"
-dest_files=["res://.godot/imported/upgrades.png-883a99ceb055d2eb710bb58a6eed8718.ctex"]
+source_file="res://sprites/Capi_Jao.png"
+dest_files=["res://.godot/imported/Capi_Jao.png-3134b0328b11c4d9c7ac35e119eb407a.ctex"]
 
 [params]
 

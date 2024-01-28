@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1he3ahuq136b"
-path="res://.godot/imported/upgrades.png-883a99ceb055d2eb710bb58a6eed8718.ctex"
+uid="uid://dy1oqgdkxto8i"
+path="res://.godot/imported/Capi_pato.png-33b18396a2c439514a51e78a2031babe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/upgrades.png"
-dest_files=["res://.godot/imported/upgrades.png-883a99ceb055d2eb710bb58a6eed8718.ctex"]
+source_file="res://sprites/Capi_pato.png"
+dest_files=["res://.godot/imported/Capi_pato.png-33b18396a2c439514a51e78a2031babe.ctex"]
 
 [params]
 

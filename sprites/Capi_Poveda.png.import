@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1he3ahuq136b"
-path="res://.godot/imported/upgrades.png-883a99ceb055d2eb710bb58a6eed8718.ctex"
+uid="uid://dr5frjjmqnjvc"
+path="res://.godot/imported/Capi_Poveda.png-bc195a222f55db7db0a62926bbb224dd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/upgrades.png"
-dest_files=["res://.godot/imported/upgrades.png-883a99ceb055d2eb710bb58a6eed8718.ctex"]
+source_file="res://sprites/Capi_Poveda.png"
+dest_files=["res://.godot/imported/Capi_Poveda.png-bc195a222f55db7db0a62926bbb224dd.ctex"]
 
 [params]
 
