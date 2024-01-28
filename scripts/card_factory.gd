@@ -87,18 +87,11 @@ var _objects_cards := {
 		H Deus O!", 
 		"type": Constants.JokesTypes.OBJETO, "rarity": 2, "cost": 1},
 		
-		{"name": "", 
-		"text": "", 
-		"type": Constants.JokesTypes.OBJETO, "rarity": 2, "cost": 1},
 		
 		{"name": "", 
 		"text": "Por que o rádio não pode ter filhos? 
 		Porque ele é estéreo", 
 		"type": Constants.JokesTypes.OBJETO, "rarity": 2, "cost": 3},
-		
-		{"name": "", 
-		"text": "", 
-		"type": Constants.JokesTypes.OBJETO, "rarity": 2, "cost": 1},
 		
 		{"name": "", 
 		"text": "O que um álcool disse para outro álcool? 
@@ -455,6 +448,45 @@ func _ready() -> void:
 func get_card_info() -> Dictionary:
 	return _piadinhas_cards[3][0]
 
+
+func build_deck() -> Array:
+	var deck = []
+	var sort = [1, 1, 1, 1, 1, 2, 2, 2, 3, 3]
+	
+	for i in range(0, 5):
+		deck.append(_objects_cards[sort.pick_random()].pick_random().duplicate(true))
+	
+	for i in range(0, 5):
+		deck.append(_animals_cards[sort.pick_random()].pick_random().duplicate(true))
+	
+	for i in range(0, 5):
+		deck.append(_names_cards[sort.pick_random()].pick_random().duplicate(true))
+	
+	for i in range(0, 5):
+		deck.append(_piadinhas_cards[sort.pick_random()].pick_random().duplicate(true))
+	
+	return deck.duplicate(true)
+
+
+func get_random_cards(p_amount := 3) -> Array:
+	var cards = []
+	var sort = [1, 1, 1, 1, 1, 2, 2, 2, 3, 3]
+	
+	for i in range(0, p_amount):
+		match randi_range(0, 3):
+			1:
+				cards.append(_objects_cards[sort.pick_random()].pick_random().duplicate(true))
+			
+			2:
+				cards.append(_animals_cards[sort.pick_random()].pick_random().duplicate(true))
+			
+			3:
+				cards.append(_names_cards[sort.pick_random()].pick_random().duplicate(true))
+			
+			4:
+				cards.append(_piadinhas_cards[sort.pick_random()].pick_random().duplicate(true))
+	
+	return cards.duplicate(true)
 
 
 # --- Private Functions ---

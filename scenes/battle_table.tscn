@@ -40,6 +40,7 @@ script/source = "extends Control
 # --- Private Variables ---
 var _player_hand_positions := {}
 var _enemy_hand_positions := {}
+var _battle_ended := false
 
 var _test_card := {
 	\"name\": \"Card\", \"text\": \"Test\", \"type\": Constants.JokesTypes.PIADINHAS,
@@ -87,9 +88,8 @@ func _ready() -> void:
 	enemy_data[\"sprite\"] = \"res://sprites/Enemy.png\"
 	var card_factory := CardFactory.new()
 	
-	for i in range(0, 15):
-		player_data[\"deck\"].append(card_factory.get_card_info())
-		enemy_data[\"deck\"].append(_test_card_2.duplicate(true))
+	player_data[\"deck\"] = card_factory.build_deck()
+	enemy_data[\"deck\"] = card_factory.build_deck()
 	
 	player.load_player_data(player_data)
 	enemy.load_player_data(enemy_data)
@@ -125,6 +125,7 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 	_player_deck.shuffle()
 	_enemy_deck.shuffle()
 	
+	_battle_ended = false
 	_new_turn()
 
 
@@ -208,6 +209,9 @@ func _draw_new_card(p_who: Character, p_card_info: Dictionary) -> void:
 
 
 func _new_turn() -> void:
+	if _battle_ended:
+		return
+	
 	await _discard_characters_cards()
 	_draw_characters_cards()
 	_enemy_obj.new_turn()
@@ -290,8 +294,10 @@ func _enemy_turn() -> void:
 	_action_owner = _enemy_obj
 	await get_tree().create_timer(1.0).timeout
 	
-	if _enemy_cards_count > 0:
-		var card = _enemy_hand_container.get_child(0)
+	var cards = _enemy_hand_container.get_children()
+	cards.shuffle()
+	
+	for card in cards:
 		await request_card_use(card)
 	
 	_new_turn()
@@ -307,6 +313,8 @@ func _do_card_tween(p_card: Node2D, p_final_pos: Vector2,
 
 
 func _end_match(p_winner: Character) -> void:
+	_battle_ended = true
+	
 	if p_winner == _player_obj:
 		print(\"player win\")
 	
@@ -440,7 +448,6 @@ func _on_action_points_changed(p_current_value: int, p_is_player: bool) -> void:
 
 
 func _on_laugh_gauge_changed(p_current_value: int, p_is_player: bool) -> void:
-	print(p_current_value)
 	if p_is_player:
 		_player_laugh_bar.value = p_current_value
 	
@@ -519,24 +526,6 @@ offset_top = 638.0
 offset_right = 187.0
 offset_bottom = 700.0
 text = "End Turn"
-
-[node name="player_health" type="Label" parent="gui"]
-offset_left = 194.0
-offset_top = 633.0
-offset_right = 360.0
-offset_bottom = 714.0
-text = "Enemy"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="enemy_health" type="Label" parent="gui"]
-offset_left = 773.0
-offset_top = 316.0
-offset_right = 939.0
-offset_bottom = 397.0
-text = "Enemy"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="player_status" type="Control" parent="gui"]
 layout_mode = 3
