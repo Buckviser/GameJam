@@ -3,6 +3,10 @@ extends Node2D
 class_name Character
 
 # --- Signals ---
+signal laugh_gauge_changed(laugh_gauge)
+signal action_points_changed(action_points)
+
+
 # --- Enums ---
 # --- Constants ---
 # --- Exported Variables ---
@@ -10,12 +14,13 @@ class_name Character
 
 # --- Public Variables ---
 var player_name: String = "Matheus"
-var current_health: int
-var max_health := 100
+var current_laugh := 0
+var current_action_points := 3
+var laugh_limit := 100
 var resistences := {}
 var draw_amount := 3
-var max_locks := 1
-var locks_remaining: int
+var max_locks := 0
+var locks_remaining := 0
 var deck: Array
 
 
@@ -33,17 +38,31 @@ func new_battle_preparations() -> void:
 	locks_remaining = max_locks
 
 
+func new_turn() -> void:
+	current_action_points = 3
+	emit_signal("action_points_changed", current_action_points)
+
+
+func request_action_points_use(p_amount: int) -> bool:
+	if p_amount > current_action_points:
+		return false
+	
+	current_action_points -= p_amount
+	emit_signal("action_points_changed", current_action_points)
+	return true
+
+
 func load_player_data(p_data: Dictionary) -> void:
 	player_name = p_data["name"]
 	$Sprite2D.texture = load(p_data["sprite"])
-	max_health = p_data["max_health"]
+	laugh_limit = p_data["laugh_limit"]
 	resistences = p_data["resistences"]
 	draw_amount = p_data["draw_amount"]
 	max_locks = p_data["max_locks"]
 	deck = p_data["deck"]
 	
 	locks_remaining = max_locks
-	current_health = max_health
+	current_laugh = 0
 	$Label.text = player_name
 
 func play_animation(p_anim_name: String) -> void:
@@ -59,8 +78,9 @@ func set_character_type(p_type: String) -> void:
 
 
 func receive_damage(p_card: Node2D) -> int:
-	current_health -= max(0, p_card.card_power - resistences[p_card.card_type])
-	return current_health
+	current_laugh += min(-5, p_card.card_power - resistences[p_card.card_type])
+	emit_signal("laugh_gauge_changed", current_laugh)
+	return current_laugh
 
 
 # --- Private Functions ---

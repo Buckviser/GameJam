@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://1elqayaj0cj6"]
+[gd_scene load_steps=13 format=3 uid="uid://1elqayaj0cj6"]
 
 [ext_resource type="PackedScene" uid="uid://d3we480ibjoa8" path="res://scenes/card.tscn" id="1_sqmq8"]
 [ext_resource type="Texture2D" uid="uid://bfqtrrndfk5fb" path="res://sprites/cartinha_mesa_back.png" id="2_7xvee"]
@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://bmf63rg2ctow7" path="res://sprites/Riso_base.png" id="7_ibb8h"]
 [ext_resource type="Texture2D" uid="uid://bsfks25acnehb" path="res://sprites/Riso_meio.png" id="8_yv6wm"]
 [ext_resource type="Texture2D" uid="uid://bbluxq00eovce" path="res://sprites/Riso_fim.png" id="9_vsnu5"]
+[ext_resource type="Texture2D" uid="uid://el4y13scav0o" path="res://sprites/AP.png" id="10_hkgux"]
+[ext_resource type="Texture2D" uid="uid://c5grw7botdiyu" path="res://sprites/AP_ORB.png" id="11_hlx5f"]
 
 [sub_resource type="GDScript" id="GDScript_si2f6"]
 script/source = "extends Control
@@ -131,6 +133,9 @@ func prepare_battle(p_player: Character, p_enemy: Character) -> void:
 
 func request_card_use(p_card: Node2D) -> void:
 	if p_card.card_owner != _action_owner:
+		return
+	
+	if p_card.card_owner.can_use_card(p_card) == false:
 		return
 	
 	var final_pos
@@ -425,10 +430,10 @@ offset_bottom = 700.0
 text = "End Turn"
 
 [node name="player_health" type="Label" parent="gui"]
-offset_left = 44.0
-offset_top = 501.0
-offset_right = 210.0
-offset_bottom = 582.0
+offset_left = 194.0
+offset_top = 633.0
+offset_right = 360.0
+offset_bottom = 714.0
 text = "Enemy"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -524,6 +529,22 @@ texture = ExtResource("8_yv6wm")
 layout_mode = 2
 texture = ExtResource("9_vsnu5")
 
+[node name="action_points" type="Sprite2D" parent="gui/player_status"]
+position = Vector2(115, 501)
+texture = ExtResource("10_hkgux")
+
+[node name="1" type="Sprite2D" parent="gui/player_status/action_points"]
+position = Vector2(-42, 39)
+texture = ExtResource("11_hlx5f")
+
+[node name="2" type="Sprite2D" parent="gui/player_status/action_points"]
+position = Vector2(0, 38)
+texture = ExtResource("11_hlx5f")
+
+[node name="3" type="Sprite2D" parent="gui/player_status/action_points"]
+position = Vector2(42, 37)
+texture = ExtResource("11_hlx5f")
+
 [node name="enemy_status" type="Control" parent="gui"]
 layout_mode = 3
 anchors_preset = 0
@@ -534,10 +555,10 @@ offset_bottom = 366.0
 
 [node name="laugh_bar" type="Control" parent="gui/enemy_status"]
 anchors_preset = 0
-offset_left = 369.0
-offset_top = 16.0
-offset_right = 409.0
-offset_bottom = 56.0
+offset_left = 373.0
+offset_top = 56.0
+offset_right = 413.0
+offset_bottom = 96.0
 
 [node name="back" type="HBoxContainer" parent="gui/enemy_status/laugh_bar"]
 layout_mode = 0
@@ -607,6 +628,22 @@ texture = ExtResource("8_yv6wm")
 [node name="TextureRect6" type="TextureRect" parent="gui/enemy_status/laugh_bar/front"]
 layout_mode = 2
 texture = ExtResource("9_vsnu5")
+
+[node name="action_points" type="Sprite2D" parent="gui/enemy_status"]
+position = Vector2(480, 4)
+texture = ExtResource("10_hkgux")
+
+[node name="1" type="Sprite2D" parent="gui/enemy_status/action_points"]
+position = Vector2(-42, 39)
+texture = ExtResource("11_hlx5f")
+
+[node name="2" type="Sprite2D" parent="gui/enemy_status/action_points"]
+position = Vector2(0, 38)
+texture = ExtResource("11_hlx5f")
+
+[node name="3" type="Sprite2D" parent="gui/enemy_status/action_points"]
+position = Vector2(42, 37)
+texture = ExtResource("11_hlx5f")
 
 [node name="used_player_card_position" type="Marker2D" parent="."]
 z_index = 1
