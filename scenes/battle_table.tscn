@@ -534,10 +534,10 @@ offset_bottom = 366.0
 
 [node name="laugh_bar" type="Control" parent="gui/enemy_status"]
 anchors_preset = 0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = 45.0
-offset_bottom = 43.0
+offset_left = 369.0
+offset_top = 16.0
+offset_right = 409.0
+offset_bottom = 56.0
 
 [node name="back" type="HBoxContainer" parent="gui/enemy_status/laugh_bar"]
 layout_mode = 0
