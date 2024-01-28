@@ -46,12 +46,12 @@ var is_on_hand := false
 var card_owner: Character
 var card_power: int
 var card_type: String
+var card_cost := 1
 
 
 # --- Private Variables ---
 var _card_name: String
 var _card_text: String
-var _card_cost := 1
 var _card_rarity := 1
 var _flip_side := 0
 
@@ -69,11 +69,11 @@ func set_card_to(p_dict_info: Dictionary) -> void:
 	_card_name = p_dict_info[\"name\"]
 	_card_text = p_dict_info[\"text\"]
 	card_type = p_dict_info[\"type\"]
-	_card_cost = p_dict_info[\"cost\"]
+	card_cost = p_dict_info[\"cost\"]
 	_card_rarity = p_dict_info[\"rarity\"]
 	
 	_card_description_node.text = _card_text
-	_card_cost_node.text = str(_card_cost)
+	_card_cost_node.text = str(card_cost)
 	_solve_card_power()
 	
 	match _card_rarity:
@@ -108,7 +108,7 @@ func get_card_data() -> Dictionary:
 	dict[\"name\"] = _card_name
 	dict[\"text\"] = _card_text
 	dict[\"type\"] = card_type
-	dict[\"cost\"] = _card_cost
+	dict[\"cost\"] = card_cost
 	dict[\"rarity\"] = _card_rarity
 	
 	return dict
@@ -171,33 +171,33 @@ func make_text_grab_focus() -> void:
 # - Common Use Functions -
 func _solve_card_power() -> void:
 	if _card_rarity == 1:
-		if _card_cost == 1:
+		if card_cost == 1:
 			card_power = 3
 		
-		elif _card_cost == 2:
+		elif card_cost == 2:
 			card_power = 4
 		
-		elif _card_cost == 3:
+		elif card_cost == 3:
 			card_power = 6
 	
 	elif _card_rarity == 2:
-		if _card_cost == 1:
+		if card_cost == 1:
 			card_power = 5
 		
-		elif _card_cost == 2:
+		elif card_cost == 2:
 			card_power = 7
 		
-		elif _card_cost == 3:
+		elif card_cost == 3:
 			card_power = 9
 	
 	elif _card_rarity == 3:
-		if _card_cost == 1:
+		if card_cost == 1:
 			card_power = 8
 		
-		elif _card_cost == 2:
+		elif card_cost == 2:
 			card_power = 10
 		
-		elif _card_cost == 3:
+		elif card_cost == 3:
 			card_power = 11
 
 
