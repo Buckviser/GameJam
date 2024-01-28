@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://d3we480ibjoa8"]
+[gd_scene load_steps=11 format=3 uid="uid://d3we480ibjoa8"]
 
 [ext_resource type="Texture2D" uid="uid://bmxlpq7w2qae7" path="res://sprites/Cartas_-_fundo.png" id="1_u8s0t"]
 [ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="3_8edwt"]
@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://chlwrw5lsf7u3" path="res://sprites/Carta_Raridade_-_Bronze.png" id="4_1xt0e"]
 [ext_resource type="Texture2D" uid="uid://b0cyfn1734cgu" path="res://sprites/Layout_Cartas.png" id="4_hva5v"]
 [ext_resource type="Texture2D" uid="uid://bx2nxqgynn0bn" path="res://sprites/Carta_-_Piadinha.png" id="4_k38op"]
-[ext_resource type="Texture2D" uid="uid://2xx4gw3rqnlw" path="res://sprites/Tipo_de_Piada_-_Toc_Toc.png" id="5_ju462"]
 [ext_resource type="Texture2D" uid="uid://cmcq60j1ae44a" path="res://sprites/Carta_-_Toc_Toc.png" id="5_vwhxw"]
 [ext_resource type="Texture2D" uid="uid://x5phimer2iwn" path="res://sprites/Carta_-_Trocadilho.png" id="6_t1frb"]
 
@@ -259,5 +258,5 @@ visible = false
 layout_mode = 0
 offset_right = 102.0
 offset_bottom = 145.0
-texture = ExtResource("5_ju462")
+texture = ExtResource("4_k38op")
 expand_mode = 1
