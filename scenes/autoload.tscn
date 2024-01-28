@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbne2t7pg7ikp"]
+
+[sub_resource type="GDScript" id="GDScript_msun3"]
+script/source = "extends Node2D
+
+# --- Signals ---
+# --- Enums ---
+# --- Constants ---
+# --- Exported Variables ---
+# --- Public Variables ---
+
+
+# --- Private Variables ---
+var _sprites: Array = [\"res://sprites/Capi_Cheff.png\", \"res://sprites/Capi_Confirma.png\",
+\"res://sprites/Capi_Jao.png\", \"res://sprites/Capi_Jow.png\", \"res://sprites/Capi_Leo.png\", 
+\"res://sprites/Capi_Mago.png\", \"res://sprites/Capi_pato.png\", \"res://sprites/Capi_Pimp.png\", 
+\"res://sprites/Capi_Poveda.png\"]
+
+var _player: Character
+var _enemy: Character
+
+
+# --- Onready Variables ---
+
+
+# --- Engine Callbacks ---
+func _ready() -> void:
+	#print(CardFactory.new().get_random_cards())
+	pass
+#	var player = preload(\"res://scenes/character.tscn\").instantiate()
+#	var enemy = preload(\"res://scenes/character.tscn\").instantiate()
+#
+#	var player_data = Constants.TEST_PLAYER_DATA.duplicate(true)
+#	var enemy_data = Constants.TEST_PLAYER_DATA.duplicate(true)
+#
+#	enemy_data[\"name\"] = \"Enemy\"
+#	enemy_data[\"sprite\"] = \"res://sprites/Enemy.png\"
+#	var card_factory := CardFactory.new()
+#
+#	player_data[\"deck\"] = card_factory.build_deck()
+#	enemy_data[\"deck\"] = card_factory.build_deck()
+#
+#	player.load_player_data(player_data)
+#	enemy.load_player_data(enemy_data)
+
+
+# --- Public Functions ---
+func get_characters() -> Array:
+	if _player == null:
+		await generate_new_enemy()
+		await generate_player()
+	
+	return [_player, _enemy]
+
+
+func player_save(p_player: Character) -> void:
+	_player = p_player
+
+
+func enemy_data_save(p_enemy: Character) -> void:
+	_enemy = p_enemy
+
+
+func add_new_card(p_card_info: Dictionary) -> void:
+	_player.deck.append(p_card_info)
+
+
+func generate_new_enemy() -> void:
+	var enemy = preload(\"res://scenes/character.tscn\").instantiate()
+	var enemy_data = Constants.TEST_PLAYER_DATA.duplicate(true)
+	
+	enemy_data[\"name\"] = \"Enemy\"
+	enemy_data[\"sprite\"] = _sprites.pick_random()
+	var card_factory := CardFactory.new()
+	
+	enemy_data[\"deck\"] = card_factory.build_deck()
+	enemy.load_player_data(enemy_data)
+	_enemy = enemy
+
+
+func generate_player() -> void:
+	var player = preload(\"res://scenes/character.tscn\").instantiate()
+	var player_data = Constants.TEST_PLAYER_DATA.duplicate(true)
+	
+	player_data[\"name\"] = \"Player\"
+	player_data[\"sprite\"] = \"res://sprites/Player.png\"
+	var card_factory := CardFactory.new()
+	player_data[\"deck\"] = card_factory.build_deck()
+	player.load_player_data(player_data)
+	_player = player
+
+
+# --- Private Functions ---
+# - Common Use Functions -
+# - Setget Functions -
+# - Signal Functions -
+
+"
+
+[node name="autoload" type="Node2D"]
+script = SubResource("GDScript_msun3")
+
+[node name="musica" type="AudioStreamPlayer2D" parent="."]
+
+[node name="carta" type="AudioStreamPlayer2D" parent="."]

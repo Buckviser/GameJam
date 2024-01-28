@@ -10,15 +10,20 @@ config_version=5
 
 [application]
 
-config/name="UTC Game Jam"
-run/main_scene="res://scenes/battle_table.tscn"
+config/name="Capivara Trocadilho Tournament"
+run/main_scene="res://scenes/primeiro_menu.tscn"
 config/features=PackedStringArray("4.1", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Autoload="*res://scenes/autoload.tscn"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/mode=3
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

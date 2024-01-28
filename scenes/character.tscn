@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c282fg8ptxd2n"]
+[gd_scene load_steps=9 format=3 uid="uid://c282fg8ptxd2n"]
 
 [ext_resource type="Script" path="res://scripts/character.gd" id="1_mukhl"]
 [ext_resource type="Texture2D" uid="uid://bb5v17h82eb6u" path="res://sprites/Player.png" id="2_tynyl"]
@@ -38,10 +38,45 @@ tracks/0/keys = {
 "values": [0]
 }
 
+[sub_resource type="Animation" id="Animation_6wtgw"]
+resource_name = "laugh"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [5, 6, 7, 8]
+}
+
+[sub_resource type="Animation" id="Animation_kl5jv"]
+resource_name = "holding"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [10, 11, 12, 13]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ax4cp"]
 _data = {
 "RESET": SubResource("Animation_f2kuo"),
-"idle": SubResource("Animation_c4qmq")
+"holding": SubResource("Animation_kl5jv"),
+"idle": SubResource("Animation_c4qmq"),
+"laugh": SubResource("Animation_6wtgw")
 }
 
 [node name="character" type="Node2D"]

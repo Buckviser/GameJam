@@ -81,6 +81,15 @@ func set_character_type(p_type: String) -> void:
 
 func receive_damage(p_card: Node2D) -> bool:
 	current_laugh += max(-5, p_card.card_power - resistences[p_card.card_type])
+	
+	if current_laugh < laugh_limit:
+		$AnimationPlayer.play("holding")
+		await $AnimationPlayer.animation_finished
+		$AnimationPlayer.play("idle")
+	
+	else:
+		$AnimationPlayer.play("laugh")
+	
 	emit_signal("laugh_gauge_changed", current_laugh)
 	return current_laugh >= laugh_limit
 

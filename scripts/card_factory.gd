@@ -474,16 +474,16 @@ func get_random_cards(p_amount := 3) -> Array:
 	
 	for i in range(0, p_amount):
 		match randi_range(0, 3):
-			1:
+			0:
 				cards.append(_objects_cards[sort.pick_random()].pick_random().duplicate(true))
 			
-			2:
+			1:
 				cards.append(_animals_cards[sort.pick_random()].pick_random().duplicate(true))
 			
-			3:
+			2:
 				cards.append(_names_cards[sort.pick_random()].pick_random().duplicate(true))
 			
-			4:
+			3:
 				cards.append(_piadinhas_cards[sort.pick_random()].pick_random().duplicate(true))
 	
 	return cards.duplicate(true)
