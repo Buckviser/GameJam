@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cdvsmpvahm4km" path="res://sprites/menu_confirmar_saida.png" id="4_s6i60"]
 [ext_resource type="Texture2D" uid="uid://cy2atoo0dtue2" path="res://sprites/Capi_Confirma.png" id="5_h84ra"]
 
+
 [sub_resource type="GDScript" id="GDScript_id8vg"]
 resource_name = "menu"
 script/source = "extends Control
