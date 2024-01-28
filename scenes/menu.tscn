@@ -26,15 +26,34 @@ func _ready() -> void:
 # - Setget Functions -
 # - Signal Functions -
 
+# start button functions
 func _on_button_mouse_entered():
-	$Button/AnimationPlayer.play(\"hover\")
-
+	$start_button/AnimationPlayer.play(\"hover\")
 
 func _on_button_mouse_exited():
-	$Button/AnimationPlayer.play(\"normal\")
-
+	$start_button/AnimationPlayer.play(\"normal\")
 
 func _on_button_pressed():
+	get_tree().change_scene_to_file(\"res://scenes/battle_table.tscn\")
+
+# options button functions
+func _on_options_button_mouse_entered():
+	$options_button/AnimationPlayer.play(\"hover\")
+
+func _on_options_button_mouse_exited():
+	$options_button/AnimationPlayer.play(\"normal\")
+
+func _on_options_button_pressed():
+	get_tree().change_scene_to_file(\"res://scenes/battle_table.tscn\")
+	
+# close game button functions
+func _on_close_game_button_mouse_entered():
+	$close_game_button/AnimationPlayer.play(\"hover\")
+
+func _on_close_game_button_mouse_exited():
+	$close_game_button/AnimationPlayer.play(\"normal\")
+
+func _on_close_game_button_pressed():
 	get_tree().change_scene_to_file(\"res://scenes/battle_table.tscn\")
 "
 
@@ -108,7 +127,7 @@ offset_bottom = 40.0
 texture = ExtResource("1_x4sqo")
 metadata/_edit_lock_ = true
 
-[node name="Button" type="Button" parent="."]
+[node name="start_button" type="Button" parent="."]
 layout_mode = 0
 offset_left = 132.0
 offset_top = 66.0
@@ -117,14 +136,56 @@ offset_bottom = 90.0
 scale = Vector2(5, 5)
 focus_mode = 0
 
-[node name="Sprite2D" type="Sprite2D" parent="Button"]
+[node name="Sprite2D" type="Sprite2D" parent="start_button"]
 z_index = 1
-position = Vector2(37, 12)
+position = Vector2(26.2, 18.2)
 texture = ExtResource("1_ksvt0")
 hframes = 13
 vframes = 2
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Button"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="start_button"]
+libraries = {
+"": SubResource("AnimationLibrary_jddta")
+}
+
+[node name="options_button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 132.0
+offset_top = 225.0
+offset_right = 206.0
+offset_bottom = 249.0
+scale = Vector2(5, 5)
+focus_mode = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="options_button"]
+z_index = 1
+position = Vector2(24, 24.2)
+texture = ExtResource("1_ksvt0")
+hframes = 13
+vframes = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="options_button"]
+libraries = {
+"": SubResource("AnimationLibrary_jddta")
+}
+
+[node name="close_game_button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 396.0
+offset_right = 210.0
+offset_bottom = 420.0
+scale = Vector2(5, 5)
+focus_mode = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="close_game_button"]
+z_index = 1
+position = Vector2(25, 32.4)
+texture = ExtResource("1_ksvt0")
+hframes = 13
+vframes = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="close_game_button"]
 libraries = {
 "": SubResource("AnimationLibrary_jddta")
 }
@@ -135,6 +196,12 @@ position = Vector2(750, 738)
 scale = Vector2(0.565, 0.628)
 texture = ExtResource("3_wsm7r")
 
-[connection signal="mouse_entered" from="Button" to="." method="_on_button_mouse_entered"]
-[connection signal="mouse_exited" from="Button" to="." method="_on_button_mouse_exited"]
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="mouse_entered" from="start_button" to="." method="_on_button_mouse_entered"]
+[connection signal="mouse_exited" from="start_button" to="." method="_on_button_mouse_exited"]
+[connection signal="pressed" from="start_button" to="." method="_on_button_pressed"]
+[connection signal="mouse_entered" from="options_button" to="." method="_on_options_button_mouse_entered"]
+[connection signal="mouse_exited" from="options_button" to="." method="_on_options_button_mouse_exited"]
+[connection signal="pressed" from="options_button" to="." method="_on_options_button_pressed"]
+[connection signal="mouse_entered" from="close_game_button" to="." method="_on_close_game_button_mouse_entered"]
+[connection signal="mouse_exited" from="close_game_button" to="." method="_on_close_game_button_mouse_exited"]
+[connection signal="pressed" from="close_game_button" to="." method="_on_close_game_button_pressed"]
