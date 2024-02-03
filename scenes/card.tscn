@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://d3we480ibjoa8"]
+[gd_scene load_steps=17 format=3 uid="uid://d3we480ibjoa8"]
 
 [ext_resource type="Texture2D" uid="uid://csrgcqn22tgbd" path="res://sprites/Raridade_Cartas_-_Ouro.png" id="3_8edwt"]
 [ext_resource type="Texture2D" uid="uid://chpfrcl0djfps" path="res://sprites/Carta_Raridade_-_Prata.png" id="3_vkk01"]
@@ -212,7 +212,13 @@ func _solve_card_power() -> void:
 [sub_resource type="SystemFont" id="SystemFont_rb1nl"]
 font_names = PackedStringArray("Arial")
 
+[sub_resource type="SystemFont" id="SystemFont_00dd0"]
+font_names = PackedStringArray("Arial")
+generate_mipmaps = true
+multichannel_signed_distance_field = true
+
 [sub_resource type="LabelSettings" id="LabelSettings_u1bo6"]
+font = SubResource("SystemFont_00dd0")
 font_size = 9
 
 [sub_resource type="SystemFont" id="SystemFont_qmo45"]
